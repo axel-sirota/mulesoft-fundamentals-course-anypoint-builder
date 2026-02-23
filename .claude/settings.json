@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(unzip:*)",
+      "Bash(git:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(mvn:*)",
+      "Bash(curl:*)",
+      "Bash(.venv/bin/python3:*)",
+      "Bash(python3:*)",
+      "Bash(.venv/bin/python3 -m pip:*)",
+      "Bash(pip:*)",
+      "Bash(terraform:*)",
+      "Bash(gh:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(touch:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(diff:*)",
+      "Bash(tar:*)",
+      "Bash(zip:*)"
+    ]
+  }
+}

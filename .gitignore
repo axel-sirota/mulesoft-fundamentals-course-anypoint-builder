@@ -1,0 +1,52 @@
+# MuleSoft / Maven
+target/
+.mule/
+*.jar
+*.class
+.classpath
+.project
+.settings/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+!.vscode/settings.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Node
+node_modules/
+
+# Docker
+docker-compose.override.yml
+
+# Plans and prompts (internal build artifacts, not checked in)
+plans/
+prompts/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform (if ever used)
+.terraform/
+terraform_plans/
+*.tfstate
+*.tfstate.backup
+
+# Credentials
+*.properties
+!**/application.properties
+!**/*.properties.template
