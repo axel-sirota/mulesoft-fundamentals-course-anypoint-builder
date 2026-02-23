@@ -274,7 +274,7 @@ output application/json skipNullOn="everywhere"
 ### Ports
 | Service | Port | Purpose |
 |---------|------|---------|
-| Mock API (Flask) | 5000 | Module 1 |
+| Mock API (Flask) | 5173 | Module 1 |
 | REST Enrichment (FastAPI) | 8090 | Module 4 |
 | SOAP Validation (Spyne) | 8091 | Module 4 |
 | PostgreSQL | 5432 | Module 4 |

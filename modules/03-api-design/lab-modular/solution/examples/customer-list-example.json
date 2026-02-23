@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ACCT-001",
+    "firstName": "Leanne",
+    "lastName": "Graham",
+    "email": "leanne.graham@romaguera.com",
+    "company": "Romaguera-Crona",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-002",
+    "firstName": "Ervin",
+    "lastName": "Howell",
+    "email": "ervin.howell@deckow.com",
+    "company": "Deckow-Crist",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-004",
+    "firstName": "Patricia",
+    "lastName": "Lebsack",
+    "email": "patricia.lebsack@robel.com",
+    "company": "Robel-Corkery",
+    "industry": "Technology"
+  }
+]

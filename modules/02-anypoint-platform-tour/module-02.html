@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: Your Anypoint Platform — MuleSoft Basics</title>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#00A1E0',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#0078D4',
+        lineColor: '#8B949E',
+        secondaryColor: '#1A1F36',
+        tertiaryColor: '#2D333B'
+      }
+    });
+  </script>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-bg: #1A1F36;
+      --accent-primary: #00A1E0;
+      --accent-secondary: #0078D4;
+      --bg-main: #F8F9FA;
+      --bg-section: #FFFFFF;
+      --bg-lab: #F0F7FF;
+      --bg-lab-advanced: #F5F0FF;
+      --text-primary: #1A1F36;
+      --text-secondary: #6B7280;
+      --border-light: #E5E7EB;
+      --callout-info: #DBEAFE;
+      --callout-success: #D1FAE5;
+      --callout-warning: #FEF3C7;
+      --callout-danger: #FEE2E2;
+      --callout-instructor: #EDE9FE;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--accent-primary); }
+    .sidebar a { display: block; color: #C9CDD5; text-decoration: none; padding: 0.5rem 0; font-size: 0.9rem; transition: color 0.2s; }
+    .sidebar a:hover, .sidebar a.active { color: var(--accent-primary); }
+    .sidebar .section-group { margin-bottom: 1rem; }
+    .sidebar .section-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8B949E; margin-bottom: 0.25rem; }
+
+    /* Main Content */
+    .content {
+      margin-left: 280px;
+      max-width: 900px;
+      padding: 2rem 3rem 4rem;
+      width: calc(100% - 280px);
+    }
+
+    /* Header */
+    .module-header { margin-bottom: 3rem; }
+    .badges { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-duration { background: var(--accent-primary); color: #fff; }
+    .badge-day { background: var(--sidebar-bg); color: #fff; }
+    .module-header h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+    .subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    .objectives {
+      background: var(--callout-info);
+      border-left: 4px solid var(--accent-primary);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .objectives h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent-secondary); }
+    .objectives ul { padding-left: 1.25rem; }
+    .objectives li { margin-bottom: 0.25rem; font-size: 0.95rem; }
+
+    /* Prerequisite callout */
+    .prerequisite {
+      background: var(--callout-warning);
+      border-left: 4px solid #D97706;
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.5rem;
+    }
+    .prerequisite strong { color: #92400E; }
+    .prerequisite a { color: #D97706; font-weight: 600; }
+
+    /* Sections */
+    section { margin-bottom: 3rem; }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent-primary);
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    section h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+    p { margin-bottom: 1rem; }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+    }
+    .callout-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .callout-info { background: var(--callout-info); border-color: var(--accent-primary); }
+    .callout-success { background: var(--callout-success); border-color: #059669; }
+    .callout-warning { background: var(--callout-warning); border-color: #D97706; }
+    .callout-danger { background: var(--callout-danger); border-color: #DC2626; }
+
+    /* Instructor Notes */
+    details.instructor-note {
+      background: var(--callout-instructor);
+      border: 1px solid #C4B5FD;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+    }
+    details.instructor-note summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: #6D28D9;
+    }
+    details.instructor-note ol, details.instructor-note ul { padding-left: 1.25rem; margin-top: 0.75rem; }
+    details.instructor-note li { margin-bottom: 0.5rem; }
+
+    /* Code blocks */
+    pre[class*="language-"] {
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', monospace; }
+    :not(pre) > code {
+      background: #F3F4F6;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #DC2626;
+    }
+
+    /* Diagram container */
+    .diagram-container { margin: 1.5rem 0; text-align: center; }
+    .diagram-caption { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic; }
+    .mermaid { background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; }
+
+    /* Component cards grid */
+    .component-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .component-card {
+      background: var(--bg-section);
+      border: 1px solid var(--border-light);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: 0 10px 10px 0;
+      padding: 1.5rem;
+    }
+    .component-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent-secondary);
+    }
+    .component-card .screenshot-placeholder {
+      background: #E5E7EB;
+      border: 2px dashed #9CA3AF;
+      border-radius: 6px;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    .component-card p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .component-card .module-ref {
+      font-size: 0.8rem;
+      color: var(--accent-primary);
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    .component-card details.instructor-note {
+      margin: 0.75rem 0 0;
+      padding: 0.75rem 1rem;
+    }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
+    th { background: var(--sidebar-bg); color: #fff; font-weight: 600; }
+    tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Lab section */
+    .lab-section {
+      background: var(--bg-lab);
+      border: 2px solid #93C5FD;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .lab-section h2 { border-bottom-color: var(--accent-secondary); }
+    .lab-step { display: flex; gap: 1rem; margin: 1.5rem 0; align-items: flex-start; }
+    .step-number {
+      background: var(--accent-primary);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-bottom: 0.25rem; }
+    .validation {
+      background: var(--callout-success);
+      border-left: 4px solid #059669;
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+    .checklist li {
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .checklist input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .checklist a { color: var(--accent-primary); }
+
+    /* Closing banner */
+    .closing-banner {
+      background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .closing-banner h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .closing-banner p { opacity: 0.9; }
+
+    /* Footer */
+    .module-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 2rem 0;
+      border-top: 2px solid var(--border-light);
+      margin-top: 3rem;
+    }
+    .module-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .module-footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 1.5rem; width: 100%; }
+      .component-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar">
+    <h2>MuleSoft Basics</h2>
+    <div class="section-group">
+      <div class="section-group-title">Module 2</div>
+      <a href="#architecture" class="active">Platform Architecture</a>
+      <a href="#deep-dive">Component Deep Dive</a>
+      <a href="#demo">Demo: Walkthrough</a>
+      <a href="#lab">Lab: Scavenger Hunt</a>
+    </div>
+    <div class="section-group">
+      <div class="section-group-title">Course</div>
+      <a href="../01-intro-to-mulesoft/module-01.html">Module 1: Why MuleSoft?</a>
+      <a href="../02-anypoint-platform-tour/module-02.html">Module 2: Platform Tour</a>
+      <a href="../03-api-design/module-03.html">Module 3: API Design</a>
+      <a href="../04-integrations-rest-soap-db/module-04.html">Module 4: Integrations</a>
+      <a href="../05-dataweave/module-05.html">Module 5: DataWeave</a>
+      <a href="../06-salesforce-etl-batch/module-06.html">Module 6: SF ETL</a>
+      <a href="../07-deploy-manage-llm/module-07.html">Module 7: Deploy + AI</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- Header -->
+    <header class="module-header">
+      <div class="badges">
+        <span class="badge badge-duration">60 min</span>
+        <span class="badge badge-day">Day 1</span>
+      </div>
+      <h1>Your Anypoint Platform &mdash; A Guided Tour</h1>
+      <p class="subtitle">Learn the kitchen before you cook</p>
+
+      <div class="prerequisite">
+        <strong>Prerequisite:</strong> You need an Anypoint Platform trial account.
+        <a href="https://anypoint.mulesoft.com/login/signup" target="_blank">Sign up here &rarr;</a>
+      </div>
+
+      <div class="objectives">
+        <h3>Learning Objectives</h3>
+        <ul>
+          <li>Navigate the Anypoint Platform web interface confidently</li>
+          <li>Identify the role of each major component (Design Center, Exchange, ACB, Runtime Manager, API Manager)</li>
+          <li>Map platform components to the API development lifecycle</li>
+          <li>Verify your development environment is ready for Module 3</li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- ================================================ -->
+    <!-- SECTION 1: THEORY — Platform Architecture (15 min) -->
+    <!-- ================================================ -->
+    <section id="architecture">
+      <h2>Section 1: Platform Architecture (15 min)</h2>
+
+      <p>Anypoint Platform is MuleSoft's unified integration platform. It covers the entire API lifecycle &mdash; from designing a spec to deploying a production app to securing it with policies. Before you build anything, you need to know where everything lives. Think of this as learning the kitchen before you start cooking.</p>
+
+      <p>The platform has five major components that you'll use throughout this course. Each one handles a different phase of the lifecycle, and they're connected by a shared asset catalog called Exchange.</p>
+
+      <h3>Diagram 1: Anypoint Platform Architecture</h3>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Design &amp; Build
+        DC["Design Center<br/>(API Designer)"]
+        EX["Exchange<br/>(Asset Catalog)"]
+        ACB["Anypoint Code Builder<br/>(VS Code IDE)"]
+    end
+
+    subgraph Deploy &amp; Run
+        RM["Runtime Manager"]
+        CH["CloudHub 2.0<br/>(Hosted Runtime)"]
+    end
+
+    subgraph Secure &amp; Govern
+        AM["API Manager<br/>(Policies &amp; SLAs)"]
+        VIS["Visualizer<br/>(App Network)"]
+    end
+
+    DC -->|"publishes spec"| EX
+    EX -->|"consumed by"| ACB
+    ACB -->|"deploys to"| RM
+    RM -->|"runs on"| CH
+    RM -->|"governed by"| AM
+    AM -->|"visualized in"| VIS
+
+    classDef designBuild fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef deployRun fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef secureGovern fill:#7B1FA2,stroke:#4A148C,color:#fff
+
+    class DC,EX,ACB designBuild
+    class RM,CH deployRun
+    class AM,VIS secureGovern
+        </pre>
+        <p class="diagram-caption">Figure 1: Anypoint Platform Architecture &mdash; assets flow from design to deployment to governance</p>
+      </div>
+
+      <p>The flow is straightforward: you design an API specification in Design Center, publish it to Exchange (the shared asset catalog), scaffold a project from that spec in Anypoint Code Builder, implement your business logic, deploy to CloudHub via Runtime Manager, and then apply security policies in API Manager. Every tool hands off to the next.</p>
+
+      <h3>Diagram 2: The API Lifecycle</h3>
+
+      <p>Each step in the lifecycle maps to a specific module in this course. Here's the full development workflow you'll follow over the next three days:</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    S1["1. Design API Spec<br/><em>Module 3</em>"]
+    S2["2. Publish to Exchange<br/><em>Module 3</em>"]
+    S3["3. Scaffold in ACB<br/><em>Module 4</em>"]
+    S4["4. Implement Flows<br/><em>Module 4</em>"]
+    S5["5. Write MUnit Tests<br/><em>Module 4</em>"]
+    S6["6. Test Locally<br/><em>Module 4</em>"]
+    S7["7. Deploy to CloudHub<br/><em>Module 7</em>"]
+    S8["8. Apply Policies<br/><em>Module 7</em>"]
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
+
+    classDef day1 fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef day2 fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef day3 fill:#7B1FA2,stroke:#4A148C,color:#fff
+
+    class S1,S2 day1
+    class S3,S4,S5,S6 day2
+    class S7,S8 day3
+        </pre>
+        <p class="diagram-caption">Figure 2: The API Lifecycle &mdash; color-coded by course day (blue = Day 1, orange = Day 2, purple = Day 3)</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Key Insight</div>
+        <p>Notice how Day 2 (Modules 4-5) covers steps 3-6 &mdash; that's the bulk of the build work. Day 1 is about design, Day 3 is about deployment and governance. This mirrors real-world project timelines: design first, build most, deploy last.</p>
+      </div>
+
+      <h3>Diagram 3: MuleSoft MCP Server &mdash; AI-Assisted Development</h3>
+
+      <p>MuleSoft provides an MCP (Model Context Protocol) server that connects your AI-powered IDE &mdash; Cursor, VS Code with Claude Code, or similar &mdash; directly to the Anypoint Platform. Instead of clicking through the web interface, you can generate flows, specs, tests, and even deploy from natural language prompts in your editor.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    DEV["Developer IDE<br/>(Cursor / VS Code /<br/>Claude Code)"]
+    MCP["MuleSoft MCP Server<br/>(@mulesoft/mcp-server)"]
+    AP["Anypoint Platform<br/>APIs"]
+
+    DEV <-->|"MCP Protocol"| MCP
+    MCP <-->|"REST APIs"| AP
+
+    subgraph MCP Tools
+        T1["create_mule_project"]
+        T2["generate_mule_flow"]
+        T3["generate_api_spec"]
+        T4["deploy_mule_application"]
+    end
+
+    MCP --- T1
+    MCP --- T2
+    MCP --- T3
+    MCP --- T4
+
+    classDef devStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef mcpStyle fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef apStyle fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef toolStyle fill:#2D333B,stroke:#8B949E,color:#fff
+
+    class DEV devStyle
+    class MCP mcpStyle
+    class AP apStyle
+    class T1,T2,T3,T4 toolStyle
+        </pre>
+        <p class="diagram-caption">Figure 3: MuleSoft MCP Server &mdash; AI-assisted development from your IDE to Anypoint Platform</p>
+      </div>
+
+      <p>The MCP server exposes 40+ tools across categories like project creation, flow generation, API spec design, testing, and deployment. You don't need to use it for this course, but it's how modern MuleSoft development is heading &mdash; especially for teams already using AI-powered editors.</p>
+
+      <h3>Code Snippets: What Each Component Produces</h3>
+
+      <h4>Snippet 1: What Design Center Produces</h4>
+      <p>A RAML 1.0 specification that defines your API contract. This is what you'll create in Module 3:</p>
+
+      <pre class="language-yaml" data-label="RAML 1.0"><code class="language-yaml">#%RAML 1.0
+title: Customer System API
+version: v1
+baseUri: http://localhost:8081/api
+/customers:
+  get:
+    description: List all customers</code></pre>
+
+      <h4>Snippet 2: What ACB Produces</h4>
+      <p>When you scaffold a project from a RAML spec, ACB generates Mule XML flows. This is the skeleton you'll flesh out in Module 4:</p>
+
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;flow name="customer-flow"&gt;
+  &lt;http:listener config-ref="HTTP_Listener" path="/api/customers" method="GET"/&gt;
+  &lt;logger level="INFO" message="Request received for /api/customers"/&gt;
+&lt;/flow&gt;</code></pre>
+
+      <h4>Snippet 3: MCP Server Configuration</h4>
+      <p>This JSON config connects your AI IDE to Anypoint Platform via the MCP server:</p>
+
+      <pre class="language-json" data-label="MCP Config"><code class="language-json">{
+  "mcpServers": {
+    "mulesoft": {
+      "command": "npx",
+      "args": ["-y", "@mulesoft/mcp-server", "start"],
+      "env": {
+        "ANYPOINT_CLIENT_ID": "&lt;YOUR_CLIENT_ID&gt;",
+        "ANYPOINT_CLIENT_SECRET": "&lt;YOUR_CLIENT_SECRET&gt;",
+        "ANYPOINT_REGION": "PROD_US"
+      }
+    }
+  }
+}</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Connected Apps</div>
+        <p>The <code>CLIENT_ID</code> and <code>CLIENT_SECRET</code> come from a Connected App configured in Access Management. You'll create one in Module 6 when you set up Salesforce integration. For the MCP server, use an "App acts on its own behalf" type with Client Credentials grant.</p>
+      </div>
+
+      <h4>Snippet 4: What a Deployed Endpoint Looks Like</h4>
+      <p>By Module 7, your API will be live on CloudHub with a public URL:</p>
+
+      <pre class="language-bash" data-label="curl"><code class="language-bash">curl https://customer-enrichment-api.us-e1.cloudhub.io/api/customers/1</code></pre>
+
+      <pre class="language-json" data-label="Response"><code class="language-json">{
+  "id": "ACCT-001",
+  "name": "Leanne Graham",
+  "company": "Romaguera-Crona",
+  "score": 85,
+  "segment": "premium"
+}</code></pre>
+      <p>That enriched response combines data from Salesforce, a REST enrichment API, a PostgreSQL database, and a SOAP address validation service &mdash; all orchestrated by a single Mule flow.</p>
+
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 2: THEORY — Component Deep Dive (10 min) -->
+    <!-- ================================================ -->
+    <section id="deep-dive">
+      <h2>Section 2: Component Deep Dive (10 min)</h2>
+
+      <p>Now let's look at each component in more detail. For each one, you'll learn what it does, how it fits into the Customer 360 project, and which module you'll use it in.</p>
+
+      <div class="component-cards">
+
+        <!-- Card a: Design Center -->
+        <div class="component-card">
+          <h4>Design Center</h4>
+          <div class="screenshot-placeholder">[SCREENSHOT: Design Center &mdash; API Designer with RAML spec]</div>
+          <p>Where you'll design the Customer System API spec in Module 3. Design Center supports RAML 1.0 and OpenAPI 3.0 with both a visual editor and a code editor. It includes a built-in mocking service so you can test your API endpoints before writing any implementation code.</p>
+          <p>For the Customer 360 project, you'll define resources like <code>/customers</code> and <code>/customers/{customerId}</code>, data types for Customer and Contact, and example responses &mdash; all before writing a single line of Mule XML.</p>
+          <p class="module-ref">Used in: Module 3</p>
+          <details class="instructor-note">
+            <summary>Instructor Note</summary>
+            <p>Create a blank spec, show both visual and code editors. Toggle the mocking service on &mdash; send a GET request to show it returns example data. Delete the spec when done.</p>
+          </details>
+        </div>
+
+        <!-- Card b: Exchange -->
+        <div class="component-card">
+          <h4>Exchange</h4>
+          <div class="screenshot-placeholder">[SCREENSHOT: Exchange &mdash; Salesforce Connector page]</div>
+          <p>The marketplace where you'll find connectors (Salesforce, HTTP, Database), templates, examples, and your own published APIs. Think of it as npm or Maven for MuleSoft assets. When you publish your RAML spec in Module 3, it lands here. When you scaffold a project from that spec in Module 4, you pull from here.</p>
+          <p>For the Customer 360 project, you'll consume the Salesforce Connector, HTTP Request Connector, Database Connector, and Web Service Consumer (SOAP) &mdash; all found in Exchange.</p>
+          <p class="module-ref">Used in: Modules 3, 4, 6</p>
+          <details class="instructor-note">
+            <summary>Instructor Note</summary>
+            <p>Search "Salesforce" &mdash; show the connector page, version, dependency snippet. Search "HTTP" &mdash; show it. Search "Database" &mdash; show it. Say: "These three connectors are what you'll use in Module 4." Show a Salesforce migration template.</p>
+          </details>
+        </div>
+
+        <!-- Card c: Anypoint Code Builder -->
+        <div class="component-card">
+          <h4>Anypoint Code Builder (ACB)</h4>
+          <div class="screenshot-placeholder">[SCREENSHOT: ACB &mdash; Canvas view with flow components]</div>
+          <p>Where you'll build all your Mule flows from Module 4 onward. ACB is a VS Code extension &mdash; it works in VS Code, Cursor, or as a cloud IDE in the browser. It has a visual canvas for drag-and-drop flow building and an XML editor. Both views stay in sync: edit in one, see the change in the other.</p>
+          <p>ACB is MuleSoft's strategic IDE direction. All new AI-assisted features (flow generation, spec scaffolding) are ACB-exclusive. Anypoint Studio still works but ACB is where the innovation is happening.</p>
+          <p class="module-ref">Used in: Modules 4, 5, 6, 7</p>
+          <details class="instructor-note">
+            <summary>Instructor Note</summary>
+            <p>Open ACB (cloud IDE or local VS Code with extension). Show the MuleSoft panel. Create a new Mule project (just the wizard, don't finish). Show the canvas view with components, the XML view, and the connector palette on the left.</p>
+          </details>
+        </div>
+
+        <!-- Card d: Runtime Manager -->
+        <div class="component-card">
+          <h4>Runtime Manager</h4>
+          <div class="screenshot-placeholder">[SCREENSHOT: Runtime Manager &mdash; Applications list]</div>
+          <p>Where your apps run in production. You'll deploy here in Module 7. Runtime Manager supports CloudHub 2.0 (fully managed, container-based), Runtime Fabric (your own Kubernetes), or hybrid (on-prem agents). It shows app status, logs, metrics, and alerts.</p>
+          <p>CloudHub 2.0 is the current standard &mdash; it's container-based and replaces the legacy CloudHub 1.0. For the Customer 360 project, you'll deploy your enrichment API to CloudHub 2.0 and watch it go green.</p>
+          <p class="module-ref">Used in: Module 7</p>
+          <details class="instructor-note">
+            <summary>Instructor Note</summary>
+            <p>Show the applications list (empty now). Click into an environment. Show where logs would appear. Say: "By Day 3 your app will be listed here with a green Started status."</p>
+          </details>
+        </div>
+
+        <!-- Card e: API Manager -->
+        <div class="component-card">
+          <h4>API Manager</h4>
+          <div class="screenshot-placeholder">[SCREENSHOT: API Manager &mdash; Policies configuration]</div>
+          <p>Where you secure, govern, and monitor your APIs. You'll apply policies here in Module 7 &mdash; rate limiting, client ID enforcement, OAuth. API Manager shows analytics: how many calls your API receives, average latency, error rates, and which consumers are calling it.</p>
+          <p>For the Customer 360 project, you'll create an API instance from your Exchange spec and apply a rate-limiting policy to protect your endpoint from being overwhelmed.</p>
+          <p class="module-ref">Used in: Module 7</p>
+          <details class="instructor-note">
+            <summary>Instructor Note</summary>
+            <p>Show the API instances list. Click where policies get applied. Mention: "We'll come back here on Day 3 to lock down your API."</p>
+          </details>
+        </div>
+
+      </div><!-- end component-cards -->
+
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 3: DEMO — Platform Walkthrough (15 min)  -->
+    <!-- ================================================ -->
+    <section id="demo">
+      <h2>Section 3: Demo &mdash; Platform Walkthrough (15 min)</h2>
+
+      <p>Time to see the platform live. Your instructor will walk through each component in the browser while you follow along on the projector. Watch the flow: Design Center &rarr; Exchange &rarr; ACB &rarr; Runtime Manager &rarr; API Manager.</p>
+
+      <details class="instructor-note">
+        <summary>Instructor Demo: Platform Walkthrough (15 min)</summary>
+        <p>Walk through each component live in the browser. Students follow along watching your screen.</p>
+        <ol>
+          <li>
+            <strong>Design Center</strong>: Click Design Center &rarr; Create new API Specification &rarr; name it "Demo Spec" &rarr; choose RAML 1.0 &rarr; type the 5-line RAML from Code Snippet 1 above &rarr; show it validates with green checkmark &rarr; toggle to visual editor &rarr; show how the resource renders &rarr; delete the spec when done.
+          </li>
+          <li>
+            <strong>Exchange</strong>: Click Exchange &rarr; search "Salesforce" &rarr; open the Salesforce Connector page &rarr; show the version, documentation, and dependency snippet &rarr; go back &rarr; search "HTTP Request" &rarr; show it &rarr; search "Database" &rarr; show it. Say: "These three connectors are what you'll use in Module 4."
+          </li>
+          <li>
+            <strong>ACB</strong>: Open Anypoint Code Builder (cloud IDE or local VS Code with ACB extension) &rarr; show the MuleSoft panel &rarr; create a new Mule project (just show the wizard, don't need to finish) &rarr; open an existing project if you have one &rarr; show the canvas view with components &rarr; show the XML view &rarr; show the connector palette.
+          </li>
+          <li>
+            <strong>Runtime Manager</strong>: Click Runtime Manager &rarr; show the applications list &rarr; explain: empty now, populated after Module 7 &rarr; click into an environment &rarr; show where logs would appear.
+          </li>
+          <li>
+            <strong>API Manager</strong>: Click API Manager &rarr; show the API instances list &rarr; explain: this is where you create an instance from your Exchange spec and apply policies &rarr; show the policies section.
+          </li>
+        </ol>
+      </details>
+
+      <div class="callout callout-success">
+        <div class="callout-title">After the Demo</div>
+        <p>You've now seen every platform component you'll use in this course. In the next section, you'll explore them yourself in a scavenger hunt.</p>
+      </div>
+
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 4: LAB — Platform Scavenger Hunt (15-20 min) -->
+    <!-- ================================================ -->
+    <section id="lab">
+      <div class="lab-section">
+        <h2>Lab: Know Your Platform (15-20 min)</h2>
+
+        <p>Log into <a href="https://anypoint.mulesoft.com" target="_blank">Anypoint Platform</a> and complete this scavenger hunt. Each task makes you find something specific &mdash; by the end you'll know where everything lives. Record your answers in <code>platform-scavenger-hunt.md</code>.</p>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Exchange &mdash; Find the Salesforce Connector</h4>
+            <p>Navigate to Exchange and search for the Salesforce Connector. Find the latest version, the Group ID, and name one operation listed in the documentation.</p>
+            <div class="validation">Validation: You've found the connector page and can see its version number and operations list.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Exchange &mdash; Find a Template</h4>
+            <p>Search Exchange for "template" and find one that relates to Salesforce. Note the template name and what it does.</p>
+            <div class="validation">Validation: You've identified a Salesforce-related template and can describe its purpose in one sentence.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Design Center &mdash; Create a Spec</h4>
+            <p>Go to Design Center and create a new API Specification in RAML 1.0 named "My First API". Type the three-line RAML header and check that it validates. Delete it when done.</p>
+            <pre class="language-yaml"><code class="language-yaml">#%RAML 1.0
+title: My First API
+version: v1</code></pre>
+            <div class="validation">Validation: The spec shows a green checkmark (validates successfully) before you delete it.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>ACB &mdash; Create a Project</h4>
+            <p>Open Anypoint Code Builder (cloud IDE or local VS Code extension). Create a new Mule project named "hello-mule". Verify you can see the canvas view, XML view, and connector palette. Delete the project when done.</p>
+            <div class="validation">Validation: You can see all three views &mdash; canvas, XML editor, and connector palette.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h4>Runtime Manager</h4>
+            <p>Navigate to Runtime Manager. Check how many applications are deployed and which environments are available.</p>
+            <div class="validation">Validation: You can see the applications list (likely empty) and identify the available environments.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">6</div>
+          <div class="step-content">
+            <h4>Connected Apps</h4>
+            <p>Navigate to Access Management &rarr; Connected Apps. Verify you can find where Connected Apps are configured. Don't create one yet &mdash; we'll do this in Module 6.</p>
+            <div class="validation">Validation: You can see the Connected Apps configuration page.</div>
+          </div>
+        </div>
+
+      </div><!-- end lab-section -->
+
+      <h3>Environment Readiness Checklist</h3>
+      <p>After completing the scavenger hunt, verify every item below. You need all of these ready for Module 3:</p>
+
+      <ul class="checklist">
+        <li><input type="checkbox"> Anypoint Platform account active and logged in</li>
+        <li><input type="checkbox"> Can access Design Center</li>
+        <li><input type="checkbox"> Can access Exchange</li>
+        <li><input type="checkbox"> ACB extension installed in VS Code/Cursor (or cloud IDE accessible)</li>
+        <li><input type="checkbox"> Two Salesforce Developer orgs created:
+          <ul style="list-style: disc; padding-left: 1.5rem; margin-top: 0.25rem;">
+            <li>Source org: <a href="https://developer.salesforce.com/signup" target="_blank">Sign up here</a></li>
+            <li>Target org: same link, use a different email</li>
+          </ul>
+        </li>
+        <li><input type="checkbox"> Security tokens obtained for both SF orgs (Setup &rarr; Reset My Security Token)</li>
+        <li><input type="checkbox"> Mock API from Module 1 runs locally (<code>python shared/mock-api/server.py</code>)</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">SF Developer Orgs Take Time</div>
+        <p>Salesforce Developer orgs can take 5-15 minutes to provision. Sign up for both now so they're ready by Module 6. Use different email addresses for each.</p>
+      </div>
+    </section>
+
+    <!-- Closing Banner -->
+    <div class="closing-banner">
+      <h3>You Know the Kitchen</h3>
+      <p>You've toured every tool you'll use for the next three days. In Module 3, you'll start cooking &mdash; designing the Customer 360 API spec in Design Center.</p>
+    </div>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+      <a href="../01-intro-to-mulesoft/module-01.html">&larr; Module 1: Why MuleSoft?</a>
+      <a href="../03-api-design/module-03.html">Next: Module 3 &mdash; Designing the Customer 360 API &rarr;</a>
+    </footer>
+
+  </main>
+
+</body>
+</html>

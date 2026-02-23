@@ -32,11 +32,21 @@ Builds a complete module following the course blueprint and prompt specification
 - Lab solutions: complete working implementations.
 - Fixtures: realistic, consistent data using Customer 360 domain.
 
-**5. Validate**
+**5. Generate Student Version**
+- Run `shared/scripts/generate-student-html.py` on the instructor HTML to produce `module-{NN}-student.html`.
+- Verify the student version has **zero** `instructor-note` occurrences.
+- Verify all diagrams, code blocks, and lab sections are preserved in the student version.
+
+```bash
+.venv/bin/python3 shared/scripts/generate-student-html.py modules/{module-dir}/module-{NN}.html
+```
+
+**6. Validate**
 - Run through the validation checklist from the module prompt.
 - Verify all diagrams, code snippets, and links are correct.
 - For Python files: verify they run.
 - For HTML files: verify structure is complete.
+- Verify both instructor and student HTML files exist and render correctly.
 
 ## Usage
 `/build-module 1` -> Builds Module 1 (Why MuleSoft?)

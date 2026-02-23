@@ -1,0 +1,72 @@
+#%RAML 1.0
+# ============================================
+# CUSTOMER SYSTEM API — Starter Template
+# ============================================
+# Complete each TODO section below.
+# Refer to the module notebook for syntax examples.
+# Use Ctrl+Space in ACB for auto-complete suggestions.
+title: Customer System API
+version: v1
+baseUri: http://localhost:8081/api
+mediaType: application/json
+
+# TODO 1: Define the Customer data type
+# Properties: id (string), firstName (string), lastName (string),
+#   email (string), phone (string, optional), company (string),
+#   industry (string), billingStreet (string, optional),
+#   billingCity (string, optional), billingState (string, optional),
+#   billingPostalCode (string, optional)
+# Hint: Use the 'types:' keyword. Optional fields use '?' suffix
+# Expected: 11 properties total, 4 optional
+
+# TODO 2: Define the Contact data type
+# Properties: id (string), firstName (string), lastName (string),
+#   email (string), phone (string, optional), title (string, optional),
+#   accountId (string)
+# Hint: Add it under the same 'types:' block as Customer
+# Expected: 7 properties total, 2 optional
+
+# TODO 3: Define an error responses trait
+# Include 400 (Bad request), 404 (Resource not found), and 500
+#   (Internal server error) responses with example JSON bodies
+# Hint: Use 'traits:' keyword, then 'errorResponses:' with responses
+# Expected: Each error has a message (string) and code (integer)
+
+/customers:
+  # TODO 4: Add GET method
+  # - Query params: industry (string, optional), limit (integer,
+  #     default 25, min 1, max 100), offset (integer, default 0)
+  # - Response 200 with type Customer[] and example payload (3 customers)
+  # - Apply error responses trait with: is: [errorResponses]
+  # Hint: Use queryParameters: under get:, then responses: with 200:
+  # Expected: Try It in API Console returns your 3 example customers
+
+  # TODO 5: Add POST method
+  # - Request body: Customer type with example
+  # - Response 201 with created Customer example
+  # - Apply error responses trait
+  # Hint: Use body: under post:, then responses: with 201:
+  # Expected: Try It with example body returns 201
+
+  /{customerId}:
+    # TODO 6: Add GET method — returns single Customer with example
+    # - Response 200 with Customer type
+    # - Include all fields in the example (including optional billing fields)
+    # - Apply error responses trait
+    # Hint: Use ACCT-001 data for the example
+    # Expected: API Console shows the endpoint with correct method
+
+    # TODO 7: Add PUT method — accepts Customer body, returns updated Customer
+    # - Request body: Customer type with example
+    # - Response 200 with updated Customer example
+    # - Apply error responses trait
+    # Hint: Same structure as GET but with a body: section
+    # Expected: Both GET and PUT visible in API Console
+
+    /contacts:
+      # TODO 8: Add GET method — returns Contact[] with example of 2 contacts
+      # - Response 200 with Contact[] type
+      # - Example: 2 contacts for ACCT-001
+      # - Apply error responses trait
+      # Hint: Use the Contact type you defined in TODO 2
+      # Expected: Try It returns 2 example contacts

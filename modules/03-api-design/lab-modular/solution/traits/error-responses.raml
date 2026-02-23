@@ -1,0 +1,22 @@
+#%RAML 1.0 Trait
+# Trait Fragment: Error Responses
+# Apply to any method with: is: [errorResponses]
+responses:
+  400:
+    body:
+      application/json:
+        example:
+          message: "Bad request"
+          code: 400
+  404:
+    body:
+      application/json:
+        example:
+          message: "Resource not found"
+          code: 404
+  500:
+    body:
+      application/json:
+        example:
+          message: "Internal server error"
+          code: 500

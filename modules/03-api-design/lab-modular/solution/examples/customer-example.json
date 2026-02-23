@@ -1,0 +1,13 @@
+{
+  "id": "ACCT-001",
+  "firstName": "Leanne",
+  "lastName": "Graham",
+  "email": "leanne.graham@romaguera.com",
+  "phone": "555-0001",
+  "company": "Romaguera-Crona",
+  "industry": "Technology",
+  "billingStreet": "123 Innovation Drive",
+  "billingCity": "San Francisco",
+  "billingState": "CA",
+  "billingPostalCode": "94105"
+}

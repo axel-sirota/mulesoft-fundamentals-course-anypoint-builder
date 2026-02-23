@@ -205,15 +205,45 @@ The toolbar plugin + copy-to-clipboard plugin auto-add copy buttons.
 - Tables horizontally scroll on mobile
 - Font size never below 16px on mobile
 
+## Dual Versions: Instructor & Student
+
+Every module produces **two** HTML files from a single source:
+
+| File | Audience | Content |
+|------|----------|---------|
+| `module-{NN}.html` | Instructor | Full version with `<details class="instructor-note">` blocks |
+| `module-{NN}-student.html` | Students | Identical but all instructor notes and their CSS removed |
+
+### Workflow
+1. Build the **instructor version** (`module-{NN}.html`) as the source of truth.
+2. Run the generator script to produce the student version:
+   ```bash
+   .venv/bin/python3 shared/scripts/generate-student-html.py modules/{module-dir}/module-{NN}.html
+   ```
+   Or process all modules at once:
+   ```bash
+   .venv/bin/python3 shared/scripts/generate-student-html.py --all
+   ```
+3. The script strips all `<details class="instructor-note">` blocks and their CSS, adds "(Student)" to the `<title>`.
+
+### Rules
+- **Never edit the student file directly** — always edit the instructor version and regenerate.
+- The student version must have **zero** occurrences of `instructor-note`.
+- Both versions must render identically except for the missing instructor notes.
+
+---
+
 ## Validation Checklist for Every Notebook
 
 1. Opens in browser with no console errors
 2. All Mermaid diagrams render (no raw text visible)
 3. All Prism code blocks are syntax-highlighted
 4. Copy buttons work on all code blocks
-5. Collapsible `<details>` sections open/close
+5. Collapsible `<details>` sections open/close (instructor version only)
 6. Lab section has distinct background color
 7. All links are relative or to known CDNs
 8. No external images — use Mermaid or inline SVG only
 9. Readable at 18px+ on a projector
 10. Navigation footer links to adjacent modules
+11. Student version exists (`module-{NN}-student.html`)
+12. Student version has zero `instructor-note` occurrences

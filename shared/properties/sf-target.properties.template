@@ -1,0 +1,9 @@
+# Salesforce Target Org — OAuth 2.0 Username-Password Credentials
+# Copy this file to sf-target.properties and fill in your values.
+# NEVER commit the filled-in version (*.properties is gitignored).
+
+sf.target.consumerKey=REPLACE_WITH_TARGET_CLIENT_ID
+sf.target.consumerSecret=REPLACE_WITH_TARGET_CLIENT_SECRET
+sf.target.username=REPLACE_WITH_TARGET_USERNAME
+sf.target.password=REPLACE_WITH_TARGET_PASSWORD
+sf.target.securityToken=REPLACE_WITH_TARGET_SECURITY_TOKEN

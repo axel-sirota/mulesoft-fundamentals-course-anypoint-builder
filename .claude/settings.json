@@ -29,7 +29,25 @@
       "Bash(wc:*)",
       "Bash(diff:*)",
       "Bash(tar:*)",
-      "Bash(zip:*)"
+      "Bash(zip:*)",
+      "mcp__mulesoft__create_mule_project",
+      "mcp__mulesoft__generate_mule_flow",
+      "mcp__mulesoft__create_mcp_server",
+      "mcp__mulesoft__deploy_mule_application",
+      "mcp__mulesoft__list_applications",
+      "mcp__mulesoft__update_mule_application",
+      "mcp__mulesoft__run_local_mule_application",
+      "mcp__mulesoft__create_and_manage_assets",
+      "mcp__mulesoft__search_asset",
+      "mcp__mulesoft__get_platform_insights",
+      "mcp__mulesoft__get_reuse_metrics",
+      "mcp__mulesoft__manage_api_instance_policy",
+      "mcp__mulesoft__list_api_instances",
+      "mcp__mulesoft__create_and_manage_api_instances",
+      "mcp__mulesoft__manage_flex_gateway_policy_project",
+      "mcp__mulesoft__get_flex_gateway_policy_example",
+      "mcp__mulesoft__create_api_spec_project",
+      "mcp__mulesoft__generate_api_spec"
     ]
   }
 }

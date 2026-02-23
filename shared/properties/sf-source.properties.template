@@ -1,0 +1,9 @@
+# Salesforce Source Org — OAuth 2.0 Username-Password Credentials
+# Copy this file to sf-source.properties and fill in your values.
+# NEVER commit the filled-in version (*.properties is gitignored).
+
+sf.source.consumerKey=REPLACE_WITH_SOURCE_CLIENT_ID
+sf.source.consumerSecret=REPLACE_WITH_SOURCE_CLIENT_SECRET
+sf.source.username=REPLACE_WITH_SOURCE_USERNAME
+sf.source.password=REPLACE_WITH_SOURCE_PASSWORD
+sf.source.securityToken=REPLACE_WITH_SOURCE_SECURITY_TOKEN

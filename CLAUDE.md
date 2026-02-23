@@ -44,7 +44,8 @@ Can be parallelized: shared/mock-api + infrastructure, Modules 1+2, Module 5 fix
 
 ```
 modules/{01-07}-*/           # Each module: HTML notebook + lab/starter + lab/solution
-  module-{NN}.html           # Self-contained HTML notebook (no build step)
+  module-{NN}.html           # Instructor version (source of truth, has instructor notes)
+  module-{NN}-student.html   # Student version (auto-generated, no instructor notes)
   lab/starter/               # Student starting point with numbered TODOs
   lab/solution/              # Complete working implementation
 
@@ -55,7 +56,8 @@ infrastructure/              # Docker services for Module 4 labs
   db/                        # PostgreSQL init.sql with customer_scores
 
 shared/                      # Cross-module shared assets
-  mock-api/                  # Flask mock API for Module 1 (port 5000)
+  mock-api/                  # Flask mock API for Module 1 (port 5173)
+  scripts/                   # Build scripts (generate-student-html.py)
   dataweave-modules/         # Reusable DW module (from Module 5 Ex6)
   properties/                # SF credential templates
   test-resources/            # Shared test fixtures
@@ -69,7 +71,7 @@ docs/                        # Setup guide, instructor guide, troubleshooting
 
 | Service | Port | Module |
 |---------|------|--------|
-| Mock API (Flask) | 5000 | Module 1 |
+| Mock API (Flask) | 5173 | Module 1 |
 | REST Enrichment (FastAPI) | 8090 | Module 4 |
 | SOAP Validation (Spyne) | 8091 | Module 4 |
 | PostgreSQL | 5432 | Module 4 |
@@ -97,6 +99,19 @@ Flow: MCP tool first → review output → manually adjust if needed.
 Self-contained HTML files with inline CSS. CDN deps: Mermaid 11 (diagrams), Prism 1.29 (syntax highlighting with copy buttons), Inter + JetBrains Mono fonts. Must render at 18px+ for projector readability. Full template spec in `.claude/rules/html-template.md`.
 
 DataWeave has no Prism grammar — use `language-javascript` as visual fallback with `data-label="DataWeave"` on the `<pre>` tag.
+
+### Dual Versions (Instructor & Student)
+
+Every module produces **two** HTML files:
+- `module-{NN}.html` — **Instructor version** (source of truth). Contains `<details class="instructor-note">` blocks with demo scripts, talking points, and click paths.
+- `module-{NN}-student.html` — **Student version** (auto-generated). Identical content minus all instructor notes and their CSS.
+
+**Workflow:** Always edit the instructor version. Then regenerate the student version:
+```bash
+.venv/bin/python3 shared/scripts/generate-student-html.py --all
+```
+
+**Never edit student files directly.** They are derived artifacts.
 
 ## Validation Commands
 

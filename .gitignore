@@ -46,6 +46,9 @@ terraform_plans/
 *.tfstate
 *.tfstate.backup
 
+# MCP config (contains credentials)
+.mcp.json
+
 # Credentials
 *.properties
 !**/application.properties

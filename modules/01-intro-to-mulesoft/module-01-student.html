@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Why MuleSoft? — MuleSoft Basics (Student)</title>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#00A1E0',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#0078D4',
+        lineColor: '#8B949E',
+        secondaryColor: '#1A1F36',
+        tertiaryColor: '#2D333B'
+      }
+    });
+  </script>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-bg: #1A1F36;
+      --accent-primary: #00A1E0;
+      --accent-secondary: #0078D4;
+      --bg-main: #F8F9FA;
+      --bg-section: #FFFFFF;
+      --bg-lab: #F0F7FF;
+      --bg-lab-advanced: #F5F0FF;
+      --text-primary: #1A1F36;
+      --text-secondary: #6B7280;
+      --border-light: #E5E7EB;
+      --callout-info: #DBEAFE;
+      --callout-success: #D1FAE5;
+      --callout-warning: #FEF3C7;
+      --callout-danger: #FEE2E2;
+      --callout-instructor: #EDE9FE;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--accent-primary); }
+    .sidebar a { display: block; color: #C9CDD5; text-decoration: none; padding: 0.5rem 0; font-size: 0.9rem; transition: color 0.2s; }
+    .sidebar a:hover, .sidebar a.active { color: var(--accent-primary); }
+    .sidebar .section-group { margin-bottom: 1rem; }
+    .sidebar .section-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8B949E; margin-bottom: 0.25rem; }
+
+    /* Main Content */
+    .content {
+      margin-left: 280px;
+      max-width: 900px;
+      padding: 2rem 3rem 4rem;
+      width: calc(100% - 280px);
+    }
+
+    /* Header */
+    .module-header { margin-bottom: 3rem; }
+    .badges { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-duration { background: var(--accent-primary); color: #fff; }
+    .badge-day { background: var(--sidebar-bg); color: #fff; }
+    .module-header h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+    .subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    .objectives {
+      background: var(--callout-info);
+      border-left: 4px solid var(--accent-primary);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .objectives h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent-secondary); }
+    .objectives ul { padding-left: 1.25rem; }
+    .objectives li { margin-bottom: 0.25rem; font-size: 0.95rem; }
+
+    /* Sections */
+    section { margin-bottom: 3rem; }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent-primary);
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    section h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+    p { margin-bottom: 1rem; }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+    }
+    .callout-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .callout-info { background: var(--callout-info); border-color: var(--accent-primary); }
+    .callout-success { background: var(--callout-success); border-color: #059669; }
+    .callout-warning { background: var(--callout-warning); border-color: #D97706; }
+    .callout-danger { background: var(--callout-danger); border-color: #DC2626; }
+
+    /* Code blocks */
+    pre[class*="language-"] {
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', monospace; }
+    :not(pre) > code {
+      background: #F3F4F6;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #DC2626;
+    }
+
+    /* Diagram container */
+    .diagram-container { margin: 1.5rem 0; text-align: center; }
+    .diagram-caption { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic; }
+    .mermaid { background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; }
+
+    /* Warning cards */
+    .warning-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .warning-card {
+      background: var(--callout-danger);
+      border-left: 4px solid #DC2626;
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .warning-card h4 { color: #DC2626; margin-bottom: 0.25rem; font-size: 0.95rem; }
+    .warning-card p { font-size: 0.9rem; margin: 0; }
+
+    /* Comparison cards */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+    .compare-card {
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 2px solid;
+    }
+    .compare-card.bad { background: #FEF2F2; border-color: #FCA5A5; }
+    .compare-card.good { background: #F0FDF4; border-color: #86EFAC; }
+    .compare-card h4 { margin-bottom: 0.5rem; }
+    .compare-card.bad h4 { color: #DC2626; }
+    .compare-card.good h4 { color: #059669; }
+    .compare-card ul { padding-left: 1.25rem; font-size: 0.95rem; }
+    .compare-card li { margin-bottom: 0.25rem; }
+
+    /* Code compare side-by-side */
+    .code-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .code-panel h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
+    th { background: var(--sidebar-bg); color: #fff; font-weight: 600; }
+    tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Lab section */
+    .lab-section {
+      background: var(--bg-lab);
+      border: 2px solid #93C5FD;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .lab-section h2 { border-bottom-color: var(--accent-secondary); }
+    .lab-step { display: flex; gap: 1rem; margin: 1.5rem 0; align-items: flex-start; }
+    .step-number {
+      background: var(--accent-primary);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-bottom: 0.25rem; }
+    .validation {
+      background: var(--callout-success);
+      border-left: 4px solid #059669;
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    /* Closing banner */
+    .closing-banner {
+      background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .closing-banner h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .closing-banner p { opacity: 0.9; }
+
+    /* Footer */
+    .module-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 2rem 0;
+      border-top: 2px solid var(--border-light);
+      margin-top: 3rem;
+    }
+    .module-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .module-footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 1.5rem; width: 100%; }
+      .warning-cards, .compare-grid, .code-compare { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar">
+    <h2>MuleSoft Basics</h2>
+    <div class="section-group">
+      <div class="section-group-title">Module 1</div>
+      <a href="#problem" class="active">The Problem</a>
+      <a href="#demo-coupled">Demo: Coupled Way</a>
+      <a href="#solution">The Solution</a>
+      <a href="#platform">Where MuleSoft Fits</a>
+      <a href="#demo-mule">Demo: MuleSoft Way</a>
+      <a href="#journey">The 3-Day Journey</a>
+      <a href="#lab">Lab: Compare Both</a>
+    </div>
+    <div class="section-group">
+      <div class="section-group-title">Course</div>
+      <a href="../02-anypoint-platform-tour/module-02.html">Module 2: Platform Tour</a>
+      <a href="../03-api-design/module-03.html">Module 3: API Design</a>
+      <a href="../04-integrations-rest-soap-db/module-04.html">Module 4: Integrations</a>
+      <a href="../05-dataweave/module-05.html">Module 5: DataWeave</a>
+      <a href="../06-salesforce-etl-batch/module-06.html">Module 6: SF ETL</a>
+      <a href="../07-deploy-manage-llm/module-07.html">Module 7: Deploy + AI</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- Header -->
+    <header class="module-header">
+      <div class="badges">
+        <span class="badge badge-duration">60 min</span>
+        <span class="badge badge-day">Day 1</span>
+      </div>
+      <h1>Why MuleSoft? From Coupled Chaos to API-Led Connectivity</h1>
+      <p class="subtitle">The problem every integration team faces — and how Anypoint Platform solves it</p>
+      <div class="objectives">
+        <h3>Learning Objectives</h3>
+        <ul>
+          <li>Explain why point-to-point integration fails at scale</li>
+          <li>Describe the three layers of API-led connectivity (System, Process, Experience)</li>
+          <li>Identify where MuleSoft Anypoint Platform fits in the Salesforce ecosystem</li>
+          <li>Run and compare a coupled Python script vs a Mule flow doing the same job</li>
+          <li>Trace the Customer 360 use case through the API-led architecture</li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- ================================================ -->
+    <!-- SECTION 1: THEORY — The Problem (10 min)         -->
+    <!-- ================================================ -->
+    <section id="problem">
+      <h2>The Problem: Point-to-Point Spaghetti</h2>
+
+      <p>Every Salesforce team hits the same wall. You start with one org, one ERP, one data warehouse. Connecting them is easy — a script here, a scheduled job there. Then the business grows. A second CRM org for the East Region. A new enrichment vendor. A marketing platform. Suddenly you have six systems and fifteen unique connections, each one custom code with different authentication, different data formats, and different error handling built by different people at different times.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    A["Salesforce Org A<br/>(CRM - West)"] -- "sync contacts" --- B["Salesforce Org B<br/>(CRM - East)"]
+    A -- "push orders" --- C["SAP ERP"]
+    A -- "enrichment lookup" --- F["Clearbit<br/>Enrichment API"]
+    B -- "push orders" --- C
+    B -- "email triggers" --- E["SendGrid<br/>Email Service"]
+    B -- "analytics sync" --- D["Snowflake<br/>Data Warehouse"]
+    C -- "invoice data" --- D
+    C -- "order confirmations" --- E
+    D -- "enrichment lookup" --- F
+    E -- "campaign data" --- A
+    F -- "contact enrichment" --- B
+    A -- "analytics sync" --- D
+    B -- "enrichment lookup" --- F
+    C -- "enrichment lookup" --- F
+    E -- "campaign data" --- D
+
+    classDef sfStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef erpStyle fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef dataStyle fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef emailStyle fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef apiStyle fill:#C62828,stroke:#B71C1C,color:#fff
+
+    class A,B sfStyle
+    class C erpStyle
+    class D dataStyle
+    class E emailStyle
+    class F apiStyle
+        </pre>
+        <p class="diagram-caption">Figure 1: Point-to-point integration with 6 systems — every system talks directly to every other</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">The Math Gets Ugly Fast</div>
+        <p>With <strong>n</strong> systems, the number of unique connections is <strong>n &times; (n-1) / 2</strong>:</p>
+        <p>6 systems &rarr; <strong>15</strong> connections &nbsp;|&nbsp; 10 systems &rarr; <strong>45</strong> connections &nbsp;|&nbsp; 15 systems &rarr; <strong>105</strong> connections &nbsp;|&nbsp; 20 systems &rarr; <strong>190</strong> connections</p>
+      </div>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    A["Salesforce Org A<br/>(CRM - West)"] --- B["Salesforce Org B<br/>(CRM - East)"]
+    A --- C["SAP ERP"]
+    A --- D["Snowflake"]
+    A --- E["SendGrid"]
+    A --- F["Clearbit"]
+    A --- G["New Marketing<br/>Platform"]
+    B --- C
+    B --- D
+    B --- E
+    B --- F
+    B --- G
+    C --- D
+    C --- E
+    C --- F
+    C --- G
+    D --- E
+    D --- F
+    D --- G
+    E --- F
+    E --- G
+    F --- G
+
+    classDef sfStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef newStyle fill:#DC2626,stroke:#991B1B,color:#fff,stroke-width:3px
+    classDef otherStyle fill:#6B7280,stroke:#4B5563,color:#fff
+
+    class A,B sfStyle
+    class G newStyle
+    class C,D,E,F otherStyle
+        </pre>
+        <p class="diagram-caption">Figure 2: Add one system (7 total) and you jump from 15 to 21 connections — each one custom code</p>
+      </div>
+
+      <p>Every connection is bespoke. Change one system's API version and you break every system that talks to it. Transform logic is duplicated across scripts — fix a bug in one and the same bug lives on in three others. There is no central place to see what's connected to what, no standard error handling, no retry logic. When something fails at 3am, you're grepping logs across six different services hoping to find the root cause before the business notices.</p>
+
+      <p>This is exactly the world Salesforce teams live in when they have multiple orgs, external enrichment vendors, ERP systems, and data warehouses. The integrations start simple and become unmaintainable. Here's what that looks like in code:</p>
+
+      <h3>Code Snippet 1: What Coupled Code Looks Like</h3>
+
+      <pre class="language-python" data-label="demo-coupled.py"><code class="language-python">"""
+demo-coupled.py — The Coupled Way
+This script does EXACTLY what the Mule flow does... but badly.
+"""
+import requests
+
+# HARDCODED URL: Grep through 15 scripts and pray you find them all
+SOURCE_URL = "http://localhost:5173/api/customers"
+TARGET_URL = "http://localhost:5173/api/customers/import"
+
+# NO ERROR HANDLING: If the source is down, nobody knows until Monday morning
+response = requests.get(SOURCE_URL)
+customers = response.json()
+
+# INLINE TRANSFORM: Duplicated in etl_contacts.py and sync_accounts.py
+tech_customers = [
+    {
+        "full_name": f"{c['firstName']} {c['lastName']}",
+        "contact_email": c["email"],          # NO AUTH: Hope nobody finds this endpoint
+        "organization": c["company"],
+        "location": f"{c['billingCity']}, {c['billingState']}",
+        "source": "sf-org-a"                  # HARDCODED: What about org-b? org-c?
+    }
+    for c in customers
+    if c["industry"] == "Technology"           # NO RETRY: If it fails, it fails
+]
+
+# NO LOGGING: print() is not observability
+print(f"Found {len(tech_customers)} Technology customers")
+
+# DUPLICATED LOGIC: This same POST exists in 4 other scripts
+result = requests.post(TARGET_URL, json=tech_customers)
+print(f"Import result: {result.json()}")</code></pre>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 2: DEMO — The Coupled Way (5 min)        -->
+    <!-- ================================================ -->
+    <section id="demo-coupled">
+      <h2>Demo: The Coupled Way</h2>
+
+      <div class="warning-cards">
+        <div class="warning-card">
+          <h4>Hardcoded URLs</h4>
+          <p>Grep through 15 scripts hoping you find them all when the host changes.</p>
+        </div>
+        <div class="warning-card">
+          <h4>No Error Handling</h4>
+          <p>Crashes silently. Nobody knows until customers complain on Monday.</p>
+        </div>
+        <div class="warning-card">
+          <h4>Hardcoded Transform</h4>
+          <p>Field mapping duplicated across scripts. Fix one, miss three others.</p>
+        </div>
+        <div class="warning-card">
+          <h4>No Reuse</h4>
+          <p>Same logic lives in 4 files. Each maintained by a different person (or nobody).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 3: THEORY — The Solution (10 min)        -->
+    <!-- ================================================ -->
+    <section id="solution">
+      <h2>The Solution: API-Led Connectivity</h2>
+
+      <p>MuleSoft's answer is API-led connectivity — three layers of APIs, each independently deployable, testable, and reusable. Instead of every system talking directly to every other system, each backend is wrapped by a single System API. Business logic lives in Process APIs that orchestrate across systems. And user-facing applications consume Experience APIs that hide all the complexity underneath.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Experience["Experience APIs"]
+        E1["Customer 360<br/>Dashboard"]
+        E2["Migration Batch<br/>Trigger"]
+        E3["Mobile App"]
+    end
+
+    subgraph Process["Process APIs"]
+        P1["Customer Enrichment<br/>Service"]
+        P2["Account Migration<br/>Orchestrator"]
+        P3["Dedup &amp; Merge<br/>Engine"]
+    end
+
+    subgraph System["System APIs"]
+        S1["SF Org A<br/>API"]
+        S2["SF Org B<br/>API"]
+        S3["SAP<br/>API"]
+        S4["Snowflake<br/>API"]
+        S5["SendGrid<br/>API"]
+        S6["Clearbit<br/>API"]
+    end
+
+    E1 -- "enriched customer" --> P1
+    E1 -- "dedup results" --> P3
+    E2 -- "trigger migration" --> P2
+    E3 -- "customer data" --> P1
+
+    P1 -- "query accounts" --> S1
+    P1 -- "enrich company" --> S6
+    P1 -- "get scores" --> S4
+    P2 -- "read source" --> S1
+    P2 -- "write target" --> S2
+    P2 -- "sync ERP" --> S3
+    P3 -- "notify" --> S5
+    P3 -- "analytics" --> S4
+
+    classDef expStyle fill:#059669,stroke:#047857,color:#fff
+    classDef procStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef sysStyle fill:#FF6D00,stroke:#E65100,color:#fff
+
+    class E1,E2,E3 expStyle
+    class P1,P2,P3 procStyle
+    class S1,S2,S3,S4,S5,S6 sysStyle
+
+    style Experience fill:#D1FAE5,stroke:#059669,color:#065F46
+    style Process fill:#DBEAFE,stroke:#00A1E0,color:#1A1F36
+    style System fill:#FEF3C7,stroke:#FF6D00,color:#78350F
+        </pre>
+        <p class="diagram-caption">Figure 3: API-Led Connectivity — three layers, each independently deployable and reusable</p>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card bad">
+          <h4>Before: Point-to-Point</h4>
+          <ul>
+            <li>15+ custom connections</li>
+            <li>Change one, break many</li>
+            <li>No reuse across integrations</li>
+            <li>No central visibility</li>
+            <li>No governance or policies</li>
+          </ul>
+        </div>
+        <div class="compare-card good">
+          <h4>After: API-Led</h4>
+          <ul>
+            <li>Each system wrapped once</li>
+            <li>Change one System API only</li>
+            <li>Reuse APIs across consumers</li>
+            <li>Full visibility in Runtime Manager</li>
+            <li>Policies via API Manager</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Customer 360 Walkthrough</h3>
+
+      <p>Here's how API-led connectivity applies to the Customer 360 use case you'll build in this course. At the System layer, "Get Accounts from SF Org A" wraps a SOQL query behind a clean REST endpoint. "Get Enrichment from Clearbit" does the same — swap the vendor later and only this one API changes, nothing upstream breaks.</p>
+
+      <p>At the Process layer, the "Customer Enrichment Service" calls three System APIs concurrently — Salesforce for core data, the enrichment API for company details, and a database for customer scores. It merges the results, deduplicates, and returns a single enriched customer record. This is Module 4.</p>
+
+      <p>At the Experience layer, the "Customer 360 Dashboard" just calls the Process API. It doesn't know or care about the three backend systems underneath. If you add a fourth data source, you update the Process API. The dashboard never changes.</p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Key Insight</div>
+        <p>Each API is independently deployable, testable, versioned, and reusable. Change the ERP system? Only its System API changes. Add a new data source? Update the Process API. The Experience APIs — and the business users consuming them — never notice.</p>
+      </div>
+
+      <h3>Code Snippet 2: What API-Led Looks Like in MuleSoft</h3>
+
+      <pre class="language-xml" data-label="Mule 4 XML"><code class="language-xml">&lt;!-- The same operation as demo-coupled.py, but governed and resilient --&gt;
+&lt;flow name="customer-sync-flow"&gt;
+    &lt;!-- Governed by API Manager — rate limits, auth policies --&gt;
+    &lt;http:listener config-ref="HTTP_Listener_Config"
+                   path="/api/customers/sync" /&gt;
+
+    &lt;try&gt;
+        &lt;!-- URL in config, not hardcoded --&gt;
+        &lt;http:request config-ref="Source_API_Config"
+                      method="GET" path="/api/customers" /&gt;
+
+        &lt;!-- DataWeave: testable, reusable, type-safe --&gt;
+        &lt;ee:transform&gt;
+            &lt;ee:message&gt;
+                &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+payload filter ($.industry == "Technology") map {
+    full_name: $.firstName ++ " " ++ $.lastName,
+    contact_email: $.email,
+    organization: $.company
+}]]&gt;&lt;/ee:set-payload&gt;
+            &lt;/ee:message&gt;
+        &lt;/ee:transform&gt;
+
+        &lt;http:request config-ref="Target_API_Config"
+                      method="POST" path="/api/customers/import" /&gt;
+
+        &lt;!-- Visible in Runtime Manager logs + dashboards --&gt;
+        &lt;logger message="Sync complete" /&gt;
+
+        &lt;error-handler&gt;
+            &lt;on-error-continue type="HTTP:CONNECTIVITY"&gt;
+                &lt;!-- Structured error, not a crash --&gt;
+            &lt;/on-error-continue&gt;
+        &lt;/error-handler&gt;
+    &lt;/try&gt;
+&lt;/flow&gt;</code></pre>
+
+      <h3>Code Snippet 3: Before vs After — The Same Transform</h3>
+
+      <div class="code-compare">
+        <div class="code-panel">
+          <h4>Python Script</h4>
+          <pre class="language-python"><code class="language-python"># Inline, duplicated, untyped
+tech_customers = [
+    {
+        "full_name": f"{c['firstName']} {c['lastName']}",
+        "contact_email": c["email"],
+        "organization": c["company"],
+        "location": f"{c['billingCity']}, {c['billingState']}",
+        "source": "sf-org-a"
+    }
+    for c in customers
+    if c["industry"] == "Technology"
+]</code></pre>
+        </div>
+        <div class="code-panel">
+          <h4>DataWeave</h4>
+          <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+payload filter ($.industry == "Technology")
+  map (customer) -> {
+    full_name: customer.firstName
+      ++ " " ++ customer.lastName,
+    contact_email: customer.email,
+    organization: customer.company,
+    location: customer.billingCity
+      ++ ", " ++ customer.billingState,
+    source: "sf-org-a"
+}</code></pre>
+        </div>
+      </div>
+
+      <p><em>Same result. One is a script nobody can find. The other is deployed, monitored, and governed.</em></p>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 4: THEORY — Where MuleSoft Fits (5 min)  -->
+    <!-- ================================================ -->
+    <section id="platform">
+      <h2>Where MuleSoft Fits: The Anypoint Platform</h2>
+
+      <p>Anypoint Platform is where the API lifecycle lives — from design to deployment to governance. Each component maps to a specific phase, and each module in this course maps to a component.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    DC["Design Center<br/><em>Module 3</em>"] -- "publish spec" --> EX["Exchange<br/><em>Module 3</em>"]
+    EX -- "scaffold project" --> ACB["Anypoint Code Builder<br/><em>Module 4</em>"]
+    ACB -- "package &amp; deploy" --> RM["Runtime Manager<br/><em>Module 7</em>"]
+    RM -- "apply policies" --> AM["API Manager<br/><em>Module 7</em>"]
+
+    classDef designStyle fill:#7C3AED,stroke:#6D28D9,color:#fff
+    classDef exchangeStyle fill:#059669,stroke:#047857,color:#fff
+    classDef buildStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef runStyle fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef govStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+
+    class DC designStyle
+    class EX exchangeStyle
+    class ACB buildStyle
+    class RM runStyle
+    class AM govStyle
+        </pre>
+        <p class="diagram-caption">Figure 4: Anypoint Platform — the API lifecycle from design to governance</p>
+      </div>
+
+      <h3>Code Snippet 4: A Taste of Each Component</h3>
+
+      <p><strong>a) RAML API Spec (Module 3):</strong></p>
+      <pre class="language-yaml"><code class="language-yaml">#%RAML 1.0
+title: Customer System API
+version: v1
+baseUri: http://localhost:8081/api
+/customers:
+  get:
+    responses:
+      200:
+        body:
+          application/json:</code></pre>
+
+      <p><strong>b) Scatter-Gather — parallel calls (Module 4):</strong></p>
+      <pre class="language-xml" data-label="Mule 4 XML"><code class="language-xml">&lt;scatter-gather&gt;
+    &lt;route&gt;&lt;http:request config-ref="REST_API" path="/api/enrich/{id}" /&gt;&lt;/route&gt;
+    &lt;route&gt;&lt;http:request config-ref="SOAP_API" path="/validate" /&gt;&lt;/route&gt;
+    &lt;route&gt;&lt;db:select config-ref="DB_Config"&gt;&lt;db:sql&gt;SELECT * FROM scores WHERE id = :id&lt;/db:sql&gt;&lt;/db:select&gt;&lt;/route&gt;
+&lt;/scatter-gather&gt;</code></pre>
+
+      <p><strong>c) DataWeave groupBy (Module 5):</strong></p>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+payload groupBy $.industry</code></pre>
+
+      <p><strong>d) Deploy to CloudHub (Module 7):</strong></p>
+      <pre class="language-bash"><code class="language-bash">mvn clean package deploy -DmuleDeploy</code></pre>
+
+      <p>You design the spec in Design Center, publish it to Exchange, scaffold the project in Anypoint Code Builder, build the flows with connectors and DataWeave, deploy to CloudHub, and govern with API Manager policies. That's the full lifecycle — and that's exactly the path this course follows.</p>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 5: DEMO — The MuleSoft Way (10 min)      -->
+    <!-- ================================================ -->
+    <section id="demo-mule">
+      <h2>Demo: The MuleSoft Way</h2>
+
+      <h3>Side-by-Side Comparison</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Python Script</th>
+            <th>Mule Flow</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>URLs</strong></td><td>Hardcoded in source</td><td>Config properties (externalized)</td></tr>
+          <tr><td><strong>Error Handling</strong></td><td>None — crashes with stack trace</td><td>Try scope + structured error response</td></tr>
+          <tr><td><strong>Transform</strong></td><td>Inline dict comprehension, duplicated</td><td>DataWeave — testable, reusable</td></tr>
+          <tr><td><strong>Monitoring</strong></td><td><code>print()</code> to stdout</td><td>Runtime Manager logs + dashboards</td></tr>
+          <tr><td><strong>Deployment</strong></td><td>scp to a server?</td><td>CloudHub one-click deploy</td></tr>
+          <tr><td><strong>Governance</strong></td><td>None</td><td>API Manager policies (rate limit, auth)</td></tr>
+          <tr><td><strong>Testing</strong></td><td>None</td><td>MUnit with mock connectors</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 6: THEORY — The 3-Day Journey (5 min)    -->
+    <!-- ================================================ -->
+    <section id="journey">
+      <h2>The 3-Day Journey: What You'll Build</h2>
+
+      <p>Every module in this course contributes to the Customer 360 architecture. By Day 3, you'll have designed an API spec, built an enrichment engine that calls REST, SOAP, and database services in parallel, mastered DataWeave transforms, migrated data between Salesforce orgs with batch jobs and referential integrity, deployed to CloudHub, and added AI-powered classification. Here's the full picture:</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Day1["Day 1 — Design"]
+        M3["Customer System API<br/><em>Module 3: RAML Spec</em>"]
+    end
+
+    subgraph Day2["Day 2 — Build"]
+        M4["Customer Enrichment Engine<br/><em>Module 4: REST + SOAP + DB</em>"]
+        M4REST["REST Enrichment<br/>API"]
+        M4SOAP["SOAP Address<br/>Validation"]
+        M4DB["PostgreSQL<br/>Scores"]
+    end
+
+    subgraph Day3["Day 3 — Transform, Migrate &amp; Deploy"]
+        M5["DataWeave Library<br/><em>Module 5</em>"]
+        M6["SF Account Migration<br/><em>Module 6: Batch ETL</em>"]
+        M6SRC["SF Org A<br/>(Source)"]
+        M6TGT["SF Org B<br/>(Target)"]
+        M7["CloudHub Deploy<br/><em>Module 7</em>"]
+        M7AI["AI Classifier<br/><em>Module 7: MAC</em>"]
+    end
+
+    M3 -- "scaffold project" --> M4
+    M4 -- "parallel calls" --> M4REST
+    M4 -- "parallel calls" --> M4SOAP
+    M4 -- "parallel calls" --> M4DB
+    M5 -- "reusable transforms" --> M4
+    M6 -- "read accounts" --> M6SRC
+    M6 -- "upsert accounts" --> M6TGT
+    M4 -- "deploy" --> M7
+    M7 -- "classify feedback" --> M7AI
+
+    classDef day1Style fill:#3B82F6,stroke:#2563EB,color:#fff
+    classDef day2Style fill:#059669,stroke:#047857,color:#fff
+    classDef day3Style fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef infraStyle fill:#6B7280,stroke:#4B5563,color:#fff
+
+    class M3 day1Style
+    class M4 day2Style
+    class M4REST,M4SOAP,M4DB infraStyle
+    class M5,M6,M7,M7AI day3Style
+    class M6SRC,M6TGT infraStyle
+
+    style Day1 fill:#DBEAFE,stroke:#3B82F6,color:#1E3A5F
+    style Day2 fill:#D1FAE5,stroke:#059669,color:#065F46
+    style Day3 fill:#FEF3C7,stroke:#FF6D00,color:#78350F
+        </pre>
+        <p class="diagram-caption">Figure 5: Complete Customer 360 architecture — every module contributes to the final system</p>
+      </div>
+
+      <p><strong>Day 1</strong> lays the foundation: you'll understand why MuleSoft exists (this module), tour the Anypoint Platform, and design a RAML API specification for the Customer System API. <strong>Day 2</strong> is all building: nine incremental cycles adding REST, SOAP, and database connectors, DataWeave transforms, Scatter-Gather for parallelism, Choice routing, and error handling. <strong>Day 3</strong> brings it all together: deep DataWeave exercises, a batch ETL pipeline between Salesforce orgs with referential integrity, CloudHub deployment, API Manager governance, and an AI-powered classification flow.</p>
+
+      <div class="closing-banner">
+        <h3>By Day 3, you'll have built:</h3>
+        <p>RAML spec &bull; Enrichment engine &bull; DataWeave library &bull; Batch ETL pipeline &bull; CloudHub deployment &bull; AI classification</p>
+        <p><strong>Let's start.</strong></p>
+      </div>
+    </section>
+
+    <!-- ================================================ -->
+    <!-- SECTION 7: LAB — Compare Both (15-20 min)        -->
+    <!-- ================================================ -->
+    <section id="lab" class="lab-section">
+      <h2>Lab: Compare Both Approaches</h2>
+
+      <h3>Part 1 — Run the Coupled Way (5 min)</h3>
+
+      <div class="lab-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Start the Mock Server</h4>
+          <pre class="language-bash"><code class="language-bash">cd shared/mock-api
+pip install -r requirements.txt
+python server.py</code></pre>
+          <div class="validation">Validation: You see "Mock Customer API running on http://localhost:5173"</div>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Run the Coupled Script</h4>
+          <pre class="language-bash"><code class="language-bash">cd modules/01-intro-to-mulesoft
+python demo-coupled.py</code></pre>
+          <div class="validation">Validation: Output shows "Found 4 Technology customers" and import success</div>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Kill the Server and Retry</h4>
+          <p>Stop the mock server (Ctrl+C in Terminal 1). Run <code>python demo-coupled.py</code> again.</p>
+          <div class="validation">Validation: <code>ConnectionError</code> crash — no structured error, just a stack trace</div>
+        </div>
+      </div>
+
+      <h3>Part 2 — Run the MuleSoft Way (10 min)</h3>
+
+      <div class="lab-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Open the Mule Project</h4>
+          <p>Open <code>modules/01-intro-to-mulesoft/lab/starter/</code> in Anypoint Code Builder. Identify the components on the canvas: HTTP Listener, HTTP Request, Transform Message, Logger.</p>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h4>Start Mock Server and Run Mule App</h4>
+          <p>Restart the mock server. Then run the Mule application locally from ACB.</p>
+          <div class="validation">Validation: Mule startup message in console, no errors</div>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h4>Test the Sync Endpoint</h4>
+          <pre class="language-bash"><code class="language-bash">curl http://localhost:8081/api/customers/sync</code></pre>
+          <div class="validation">Validation: JSON array of 4 Technology customers with fields: full_name, contact_email, organization, location, source</div>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="step-number">7</div>
+        <div class="step-content">
+          <h4>Test Error Handling</h4>
+          <p>Stop the mock server (Ctrl+C). Run curl again.</p>
+          <pre class="language-bash"><code class="language-bash">curl http://localhost:8081/api/customers/sync</code></pre>
+          <div class="validation">Validation: Structured JSON error with "Source API unavailable" — NOT a crash</div>
+        </div>
+      </div>
+
+      <h3>Part 3 — Reflect (5 min)</h3>
+
+      <p>Answer these questions in <code>lab/starter/lab-reflection.md</code>:</p>
+
+      <ol>
+        <li>What happens when the source API is unavailable in each approach?</li>
+        <li>If you needed to add a second data source, what would you change in each approach?</li>
+        <li>Which would you trust running at 3am? Why?</li>
+      </ol>
+    </section>
+
+    <!-- Footer -->
+    <footer class="module-footer">
+      <span></span>
+      <a href="../02-anypoint-platform-tour/module-02.html">Next: Module 2 — Anypoint Platform Tour &rarr;</a>
+    </footer>
+
+  </main>
+</body>
+</html>

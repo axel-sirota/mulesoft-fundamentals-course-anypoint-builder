@@ -31,5 +31,15 @@ Runs the validation checklist from the module prompt to verify completeness and 
 - Docker Compose: validate YAML syntax.
 - Services: check port configurations match module docs.
 
-**6. Report**
+**6. Dual HTML Versions**
+- Verify both `module-{NN}.html` (instructor) and `module-{NN}-student.html` (student) exist.
+- Verify instructor version has `<details class="instructor-note">` blocks.
+- Verify student version has **zero** occurrences of `instructor-note`.
+- Verify student version retains all diagrams, code blocks, lab steps, and navigation.
+- If student version is missing or stale, regenerate:
+  ```bash
+  .venv/bin/python3 shared/scripts/generate-student-html.py modules/{module-dir}/module-{NN}.html
+  ```
+
+**7. Report**
 Output a pass/fail report for each checklist item.
