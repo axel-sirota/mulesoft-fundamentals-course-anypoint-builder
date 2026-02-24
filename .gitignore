@@ -2,6 +2,7 @@
 target/
 .mule/
 *.jar
+!shared/jdbc-drivers/*.jar
 *.class
 .classpath
 .project
