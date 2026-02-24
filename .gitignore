@@ -36,6 +36,9 @@ docker-compose.override.yml
 plans/
 prompts/
 
+# Packaged student materials
+zips/
+
 # OS
 .DS_Store
 Thumbs.db

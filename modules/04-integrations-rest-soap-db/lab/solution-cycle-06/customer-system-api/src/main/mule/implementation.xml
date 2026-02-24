@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 6 — Same logic as Cycle 5
+     The refactoring in this cycle only affects global.xml and application.properties.
+     Implementation logic is identical to Cycle 5. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <flow name="get-customer-implementation">
+        <set-variable variableName="customerId"
+                      value="#[attributes.uriParams.customerId]"
+                      doc:name="Set customerId"/>
+
+        <logger level="INFO"
+                message="#['Processing customer: ' ++ vars.customerId]"
+                doc:name="Log customerId"/>
+
+        <!-- Call REST enrichment API -->
+        <flow-ref name="get-enrichment-data" doc:name="Call REST enrichment"/>
+        <set-variable variableName="enrichmentData" value="#[payload]" doc:name="Store enrichment"/>
+
+        <!-- Query customer score from PostgreSQL -->
+        <flow-ref name="get-customer-score" doc:name="Query DB score"/>
+        <set-variable variableName="scoreData" value="#[payload[0]]" doc:name="Store score"/>
+
+        <!-- Validate address via SOAP -->
+        <flow-ref name="validate-address" doc:name="SOAP address validation"/>
+
+        <!-- Merge all three sources -->
+        <ee:transform doc:name="Merge REST + DB + SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    company: vars.enrichmentData.companyName,
+    industry: vars.enrichmentData.industry,
+    employees: vars.enrichmentData.employeeCount,
+    revenue: vars.enrichmentData.revenue,
+    score: vars.scoreData.score,
+    segment: vars.scoreData.segment,
+    addressValid: payload.body.ValidateAddressResponse.isValid,
+    addressConfidence: payload.body.ValidateAddressResponse.confidence,
+    enrichedAt: now()
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Sub-flow: REST enrichment (Cycle 3) -->
+    <sub-flow name="get-enrichment-data">
+        <http:request config-ref="Enrichment_API" method="GET"
+                      path="/enrich/{customerId}" doc:name="Call Enrichment API">
+            <http:uri-params><![CDATA[#[{customerId: vars.customerId}]]]></http:uri-params>
+        </http:request>
+    </sub-flow>
+
+    <!-- Sub-flow: Database score lookup (Cycle 4) -->
+    <sub-flow name="get-customer-score">
+        <db:select config-ref="PostgreSQL_Config" doc:name="Query customer score">
+            <db:sql>SELECT score, segment, last_updated
+                   FROM customer_scores
+                   WHERE customer_id = :customerId</db:sql>
+            <db:input-parameters><![CDATA[#[{customerId: vars.customerId}]]]></db:input-parameters>
+        </db:select>
+    </sub-flow>
+
+    <!-- Sub-flow: SOAP address validation (Cycle 5) -->
+    <sub-flow name="validate-address">
+        <wsc:consume config-ref="Address_Validation"
+                     operation="ValidateAddress"
+                     doc:name="Validate Address">
+            <wsc:message>
+                <wsc:body><![CDATA[#[%dw 2.0
+output application/xml
+ns addr http://example.com/address
+---
+addr#ValidateAddress: {
+    addr#street: "123 Innovation Drive",
+    addr#city: "Austin",
+    addr#state: "TX",
+    addr#postalCode: "78701"
+}]]]></wsc:body>
+            </wsc:message>
+        </wsc:consume>
+    </sub-flow>
+</mule>

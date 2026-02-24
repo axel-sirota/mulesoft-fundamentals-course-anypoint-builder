@@ -1,0 +1,52 @@
+[
+  {
+    "orderId": "ORD-1001",
+    "customerName": "Romaguera-Crona",
+    "orderDate": "2026-01-15",
+    "lineItems": [
+      { "itemName": "API Gateway License", "quantity": 2, "price": 1500.00 },
+      { "itemName": "Integration Platform", "quantity": 1, "price": 4500.00 },
+      { "itemName": "Support Package", "quantity": 1, "price": 800.00 }
+    ]
+  },
+  {
+    "orderId": "ORD-1002",
+    "customerName": "Deckow-Crist",
+    "orderDate": "2026-01-18",
+    "lineItems": [
+      { "itemName": "Data Connector", "quantity": 5, "price": 350.00 },
+      { "itemName": "Monitoring Dashboard", "quantity": 1, "price": 1200.00 },
+      { "itemName": "API Designer Tool", "quantity": 3, "price": 600.00 }
+    ]
+  },
+  {
+    "orderId": "ORD-1003",
+    "customerName": "Keebler LLC",
+    "orderDate": "2026-01-22",
+    "lineItems": [
+      { "itemName": "HIPAA Compliance Module", "quantity": 1, "price": 3200.00 },
+      { "itemName": "Data Encryption Add-on", "quantity": 2, "price": 750.00 },
+      { "itemName": "Audit Trail Logger", "quantity": 1, "price": 950.00 }
+    ]
+  },
+  {
+    "orderId": "ORD-1004",
+    "customerName": "Considine-Lockman",
+    "orderDate": "2026-02-01",
+    "lineItems": [
+      { "itemName": "Financial Connector", "quantity": 3, "price": 1100.00 },
+      { "itemName": "Batch Processing Engine", "quantity": 1, "price": 2800.00 },
+      { "itemName": "Data Masking Tool", "quantity": 2, "price": 500.00 }
+    ]
+  },
+  {
+    "orderId": "ORD-1005",
+    "customerName": "Hoeger LLC",
+    "orderDate": "2026-02-05",
+    "lineItems": [
+      { "itemName": "Cloud Deployment Pack", "quantity": 1, "price": 2200.00 },
+      { "itemName": "CI/CD Pipeline Plugin", "quantity": 2, "price": 450.00 },
+      { "itemName": "Load Balancer Config", "quantity": 1, "price": 1800.00 }
+    ]
+  }
+]

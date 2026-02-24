@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 4 — REST + Database
+     Calls enrichment API and PostgreSQL, merges results. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <flow name="get-customer-implementation">
+        <set-variable variableName="customerId"
+                      value="#[attributes.uriParams.customerId]"
+                      doc:name="Set customerId"/>
+
+        <logger level="INFO"
+                message="#['Processing customer: ' ++ vars.customerId]"
+                doc:name="Log customerId"/>
+
+        <!-- Cycle 3: Call REST enrichment API -->
+        <flow-ref name="get-enrichment-data" doc:name="Call REST enrichment"/>
+        <!-- Store REST result before DB call overwrites payload -->
+        <set-variable variableName="enrichmentData" value="#[payload]" doc:name="Store enrichment"/>
+
+        <!-- Cycle 4: Query customer score from PostgreSQL -->
+        <flow-ref name="get-customer-score" doc:name="Query DB score"/>
+
+        <!-- Merge REST + DB results -->
+        <ee:transform doc:name="Merge REST + DB">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    company: vars.enrichmentData.companyName,
+    industry: vars.enrichmentData.industry,
+    employees: vars.enrichmentData.employeeCount,
+    revenue: vars.enrichmentData.revenue,
+    score: payload[0].score,
+    segment: payload[0].segment
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Sub-flow: REST enrichment (Cycle 3) -->
+    <sub-flow name="get-enrichment-data">
+        <http:request config-ref="Enrichment_API" method="GET"
+                      path="/enrich/{customerId}" doc:name="Call Enrichment API">
+            <http:uri-params><![CDATA[#[{customerId: vars.customerId}]]]></http:uri-params>
+        </http:request>
+    </sub-flow>
+
+    <!-- Sub-flow: Database score lookup (Cycle 4) -->
+    <sub-flow name="get-customer-score">
+        <db:select config-ref="PostgreSQL_Config" doc:name="Query customer score">
+            <db:sql>SELECT score, segment, last_updated
+                   FROM customer_scores
+                   WHERE customer_id = :customerId</db:sql>
+            <db:input-parameters><![CDATA[#[{customerId: vars.customerId}]]]></db:input-parameters>
+        </db:select>
+    </sub-flow>
+</mule>

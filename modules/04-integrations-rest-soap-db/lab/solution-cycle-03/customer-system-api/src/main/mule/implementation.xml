@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 3 — REST Connector
+     Calls enrichment API, extracts company data. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <flow name="get-customer-implementation">
+        <set-variable variableName="customerId"
+                      value="#[attributes.uriParams.customerId]"
+                      doc:name="Set customerId"/>
+
+        <logger level="INFO"
+                message="#['Processing customer: ' ++ vars.customerId]"
+                doc:name="Log customerId"/>
+
+        <!-- Cycle 3: Call REST enrichment API -->
+        <flow-ref name="get-enrichment-data" doc:name="Call REST enrichment"/>
+
+        <!-- Format REST response -->
+        <ee:transform doc:name="Format REST response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    company: payload.companyName,
+    industry: payload.industry,
+    employees: payload.employeeCount,
+    revenue: payload.revenue
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Sub-flow: REST enrichment -->
+    <sub-flow name="get-enrichment-data">
+        <http:request config-ref="Enrichment_API" method="GET"
+                      path="/enrich/{customerId}" doc:name="Call Enrichment API">
+            <http:uri-params><![CDATA[#[{customerId: vars.customerId}]]]></http:uri-params>
+        </http:request>
+    </sub-flow>
+</mule>

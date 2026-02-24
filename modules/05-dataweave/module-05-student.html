@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: DataWeave — The Language of Integration — MuleSoft Basics (Student)</title>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#00A1E0',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#0078D4',
+        lineColor: '#8B949E',
+        secondaryColor: '#1A1F36',
+        tertiaryColor: '#2D333B'
+      }
+    });
+  </script>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-bg: #1A1F36;
+      --accent-primary: #00A1E0;
+      --accent-secondary: #0078D4;
+      --bg-main: #F8F9FA;
+      --bg-section: #FFFFFF;
+      --bg-lab: #F0F7FF;
+      --bg-lab-advanced: #F5F0FF;
+      --text-primary: #1A1F36;
+      --text-secondary: #6B7280;
+      --border-light: #E5E7EB;
+      --callout-info: #DBEAFE;
+      --callout-success: #D1FAE5;
+      --callout-warning: #FEF3C7;
+      --callout-danger: #FEE2E2;
+      --callout-instructor: #EDE9FE;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--accent-primary); }
+    .sidebar a { display: block; color: #C9CDD5; text-decoration: none; padding: 0.5rem 0; font-size: 0.9rem; transition: color 0.2s; }
+    .sidebar a:hover, .sidebar a.active { color: var(--accent-primary); }
+    .sidebar .section-group { margin-bottom: 1rem; }
+    .sidebar .section-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8B949E; margin-bottom: 0.25rem; }
+
+    /* Main Content */
+    .content {
+      margin-left: 280px;
+      max-width: 900px;
+      padding: 2rem 3rem 4rem;
+      width: calc(100% - 280px);
+    }
+
+    /* Header */
+    .module-header { margin-bottom: 3rem; }
+    .badges { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-duration { background: var(--accent-primary); color: #fff; }
+    .badge-day { background: var(--sidebar-bg); color: #fff; }
+    .module-header h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+    .subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    .objectives {
+      background: var(--callout-info);
+      border-left: 4px solid var(--accent-primary);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .objectives h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent-secondary); }
+    .objectives ul { padding-left: 1.25rem; }
+    .objectives li { margin-bottom: 0.25rem; font-size: 0.95rem; }
+
+    /* Sections */
+    section { margin-bottom: 3rem; }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent-primary);
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    section h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+    p { margin-bottom: 1rem; }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+    }
+    .callout-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .callout-info { background: var(--callout-info); border-color: var(--accent-primary); }
+    .callout-success { background: var(--callout-success); border-color: #059669; }
+    .callout-warning { background: var(--callout-warning); border-color: #D97706; }
+    .callout-danger { background: var(--callout-danger); border-color: #DC2626; }
+
+    /* Code blocks */
+    pre[class*="language-"] {
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', monospace; }
+    :not(pre) > code {
+      background: #F3F4F6;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #DC2626;
+    }
+
+    /* Diagram container */
+    .diagram-container { margin: 1.5rem 0; text-align: center; }
+    .diagram-caption { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic; }
+    .mermaid { background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; }
+
+    /* Code compare side-by-side */
+    .code-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .code-panel h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
+    th { background: var(--sidebar-bg); color: #fff; font-weight: 600; }
+    tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Lab section */
+    .lab-section {
+      background: var(--bg-lab);
+      border: 2px solid #93C5FD;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .lab-section h2 { border-bottom-color: var(--accent-secondary); }
+    .lab-section-advanced {
+      background: var(--bg-lab-advanced);
+      border: 2px solid #C4B5FD;
+    }
+    .lab-step { display: flex; gap: 1rem; margin: 1.5rem 0; align-items: flex-start; }
+    .step-number {
+      background: var(--accent-primary);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-bottom: 0.25rem; }
+    .validation {
+      background: var(--callout-success);
+      border-left: 4px solid #059669;
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    /* Exercise card */
+    .exercise-card {
+      background: var(--bg-section);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .exercise-card h3 { margin-top: 0; }
+
+    /* Closing banner */
+    .closing-banner {
+      background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .closing-banner h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .closing-banner p { opacity: 0.9; }
+
+    /* Footer */
+    .module-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 2rem 0;
+      border-top: 2px solid var(--border-light);
+      margin-top: 3rem;
+    }
+    .module-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .module-footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 1.5rem; width: 100%; }
+      .code-compare { grid-template-columns: 1fr; }
+    }
+
+    /* Playground link */
+    .playground-link {
+      display: inline-block;
+      background: var(--accent-primary);
+      color: #fff;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+    .playground-link:hover { background: var(--accent-secondary); }
+
+    /* Fixture details toggle */
+    details.fixture-toggle {
+      margin: 0.75rem 0;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+    }
+    details.fixture-toggle summary {
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--accent-secondary);
+    }
+    details.fixture-toggle pre { margin-top: 0.5rem; }
+
+    /* Stage badge */
+    .stage-badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stage-playground { background: #059669; color: #fff; }
+    .stage-acb { background: #7C3AED; color: #fff; }
+    .stage-mule { background: #DC2626; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar">
+    <h2>MuleSoft Basics</h2>
+    <div class="section-group">
+      <div class="section-group-title">Module 5</div>
+      <a href="#bridge" class="active">Bridge from Module 4</a>
+      <a href="#fundamentals">1. DW Fundamentals</a>
+      <a href="#core-functions">2. Core Functions</a>
+      <a href="#formats-nulls">3. Formats &amp; Null Handling</a>
+      <a href="#modules">4. Reusable Modules</a>
+      <a href="#demo">5. Demo: Playground Live</a>
+      <a href="#lab-basics">6. Lab 1: Basics</a>
+      <a href="#lab-advanced">7. Lab 2: Advanced</a>
+      <a href="#lab-modular">8. Lab 3: Mule Flow</a>
+    </div>
+    <div class="section-group">
+      <div class="section-group-title">Course</div>
+      <a href="../04-integrations-rest-soap-db/module-04.html">Module 4: Integrations</a>
+      <a href="../06-salesforce-etl-batch/module-06.html">Module 6: Salesforce ETL</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- ============================================================ -->
+    <!-- HEADER                                                        -->
+    <!-- ============================================================ -->
+    <header class="module-header">
+      <div class="badges">
+        <span class="badge badge-duration">~4 hours</span>
+        <span class="badge badge-day">Day 3</span>
+      </div>
+      <h1>DataWeave &mdash; The Language of Integration</h1>
+      <p class="subtitle">Transform anything into anything</p>
+      <div class="objectives">
+        <h3>Learning Objectives</h3>
+        <ul>
+          <li>Write DataWeave 2.0 transforms using core functions: <code>map</code>, <code>filter</code>, <code>reduce</code>, <code>groupBy</code>, <code>mapObject</code>, <code>pluck</code></li>
+          <li>Convert between JSON, CSV, and XML formats with a single output directive</li>
+          <li>Handle null values safely with <code>default</code> and <code>skipNullOn</code></li>
+          <li>Build and import reusable DataWeave modules</li>
+          <li>Use the DataWeave Playground for rapid experimentation</li>
+          <li>Extract inline DataWeave into external <code>.dwl</code> files using the <code>resource</code> attribute</li>
+          <li>Apply DataWeave to the Customer 360 Scatter-Gather merge from Module 4</li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- BRIDGE FROM MODULE 4                                          -->
+    <!-- ============================================================ -->
+    <section id="bridge">
+      <h2>Bridge from Module 4</h2>
+
+      <p>In Module 4 you wrote DataWeave inside Transform Message components &mdash; variable assignments, Scatter-Gather merges, and error response payloads. You saw how powerful it was, but you only scratched the surface. Now you&rsquo;ll master the language itself.</p>
+
+      <p>This module follows a <strong>three-stage progression</strong> that takes you from zero-setup experimentation to production-ready transforms:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Tool</th>
+            <th>When</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="stage-badge stage-playground">Stage 1</span></td>
+            <td><strong>DW Playground</strong></td>
+            <td>Exercises 1&ndash;8</td>
+            <td>Zero setup, instant feedback, pure language focus</td>
+          </tr>
+          <tr>
+            <td><span class="stage-badge stage-acb">Stage 2</span></td>
+            <td><strong>ACB DW Preview</strong></td>
+            <td>Exercise 6 module, Exercise 9</td>
+            <td>DW in project context, sample data, classpath imports</td>
+          </tr>
+          <tr>
+            <td><span class="stage-badge stage-mule">Stage 3</span></td>
+            <td><strong>Mule Flow</strong></td>
+            <td>Exercise 10</td>
+            <td>Refactor Module 4 inline DW into external files with reusable imports</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Open the DataWeave Playground now &mdash; you&rsquo;ll use it throughout this module:</p>
+      <p><a href="https://dataweave.mulesoft.com/" class="playground-link" target="_blank">Open DataWeave Playground &rarr;</a></p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Why Playground First?</div>
+        <p>The Playground lets you focus on learning the <em>language</em> without Mule project overhead. You paste input data, write a script, and see the output instantly. No Maven builds, no XML wiring, no deployment. Once you&rsquo;re confident with the syntax, we&rsquo;ll move into ACB and then into real flows.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 1: DW FUNDAMENTALS                                    -->
+    <!-- ============================================================ -->
+    <section id="fundamentals">
+      <h2>Section 1: DataWeave Fundamentals (20 min)</h2>
+
+      <p>DataWeave 2.0 is MuleSoft&rsquo;s expression language. Every Transform Message, every Set Variable, every conditional expression in a Mule flow uses DataWeave. It&rsquo;s a <strong>functional, statically-typed language</strong> purpose-built for data transformation.</p>
+
+      <!-- Diagram 1: Where DataWeave Lives -->
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+  A["HTTP Request"] -->|"payload (JSON)"| B["Transform Message"]
+  B -->|"DataWeave Script"| C["Transformed Output"]
+  C -->|"payload (CSV/XML/JSON)"| D["Next Processor"]
+
+  subgraph DW["DataWeave Engine"]
+    B
+  end
+
+  style DW fill:#00A1E0,stroke:#0078D4,color:#fff
+  style A fill:#1A1F36,stroke:#8B949E,color:#fff
+  style D fill:#1A1F36,stroke:#8B949E,color:#fff
+        </pre>
+        <p class="diagram-caption">Figure 1: DataWeave lives inside Transform Message components, converting between any format</p>
+      </div>
+
+      <h3>Script Structure</h3>
+      <p>Every DataWeave script has three parts: a <strong>header</strong> with directives, a <strong>separator</strong> (<code>---</code>), and a <strong>body</strong> expression that produces the output.</p>
+
+      <!-- Snippet 1: Basic DW Structure -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  message: "Hello, DataWeave!",
+  timestamp: now(),
+  version: 2.0
+}</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">The Three Parts</div>
+        <p><code>%dw 2.0</code> &mdash; declares the DataWeave version (always 2.0).<br>
+        <code>output application/json</code> &mdash; sets the output format (JSON, CSV, XML, etc.).<br>
+        <code>---</code> &mdash; separates the header from the body expression.</p>
+      </div>
+
+      <h3>Accessing the Mule Event</h3>
+      <p>Inside a Mule flow, DataWeave can access three parts of the Mule Event: the <code>payload</code> (message body), <code>attributes</code> (metadata like headers and query params), and <code>vars</code> (flow variables).</p>
+
+      <!-- Snippet 2: Mule Event Access -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  // The message body (set by previous processor)
+  customerData: payload,
+
+  // HTTP request metadata
+  queryParam: attributes.queryParams.source,
+  contentType: attributes.headers."content-type",
+
+  // Flow variables (set by Set Variable)
+  customerId: vars.customerId
+}</code></pre>
+
+      <h3>Selectors</h3>
+      <p>DataWeave provides powerful selectors to navigate data structures. These work on both JSON objects and XML elements.</p>
+
+      <!-- Snippet 3: Selectors -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  // Single-value selector: first match
+  name: payload.firstName,
+
+  // Multi-value selector: ALL matches as array (XML)
+  allCategories: payload.catalog.*category,
+
+  // Descendant selector: searches entire tree
+  allEmails: payload..email,
+
+  // Filter selector: elements matching condition
+  techCustomers: payload[?($.industry == "Technology")],
+
+  // Attribute selector (XML only)
+  productId: payload.product.@id
+}</code></pre>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 2: CORE FUNCTIONS                                     -->
+    <!-- ============================================================ -->
+    <section id="core-functions">
+      <h2>Section 2: Core Functions (20 min)</h2>
+
+      <p>DataWeave&rsquo;s core functions are your primary tools for transforming data. Each function takes a collection and a lambda (anonymous function), and returns a new collection. The lambda parameters use <code>$</code> (first param) and <code>$$</code> (second param) as shorthand.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th><code>$</code> means</th>
+            <th><code>$$</code> means</th>
+            <th>Returns</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>map</code></td><td>item</td><td>index</td><td>Array</td></tr>
+          <tr><td><code>filter</code></td><td>item</td><td>index</td><td>Array</td></tr>
+          <tr><td><strong><code>reduce</code></strong></td><td><strong>item</strong></td><td><strong>accumulator</strong></td><td>Any</td></tr>
+          <tr><td><code>mapObject</code></td><td>value</td><td>key</td><td>Object</td></tr>
+          <tr><td><code>pluck</code></td><td>value</td><td>key</td><td>Array</td></tr>
+          <tr><td><code>groupBy</code></td><td>&mdash;</td><td>&mdash;</td><td><strong>Object</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3><code>map</code> &mdash; Transform Each Element</h3>
+      <p>The <code>map</code> function iterates over an array and transforms each element. It always returns a new array of the same size.</p>
+
+      <!-- Snippet 4: map -->
+      <div class="code-compare">
+        <div class="code-panel">
+          <h4>Input (JSON)</h4>
+          <pre class="language-json"><code class="language-json">[
+  {"firstName": "Leanne", "lastName": "Graham", "company": "Romaguera-Crona"},
+  {"firstName": "Ervin", "lastName": "Howell", "company": "Deckow-Crist"}
+]</code></pre>
+        </div>
+        <div class="code-panel">
+          <h4>DataWeave</h4>
+          <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+payload map {
+  fullName: $.firstName ++ " " ++ $.lastName,
+  company: $.company
+}</code></pre>
+        </div>
+      </div>
+
+      <h3><code>filter</code> &mdash; Keep Matching Elements</h3>
+      <p>The <code>filter</code> function returns only elements where the lambda evaluates to <code>true</code>.</p>
+
+      <!-- Snippet 5: filter -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+// Keep only Technology companies
+payload filter ($.industry == "Technology")
+
+// Chain with map to transform the filtered results
+// payload filter ($.industry == "Technology") map { name: $.company }</code></pre>
+
+      <h3><code>reduce</code> &mdash; Aggregate to a Single Value</h3>
+      <!-- Snippet 6: reduce -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  // Sum all order amounts
+  totalRevenue: payload reduce ((item, acc = 0) -> acc + item.amount),
+
+  // Count items
+  orderCount: sizeOf(payload),
+
+  // Build a comma-separated string
+  allNames: payload reduce ((item, acc = "") ->
+    if (acc == "") item.name
+    else acc ++ ", " ++ item.name
+  )
+}</code></pre>
+
+      <div class="callout callout-danger">
+        <div class="callout-title">Reduce Gotcha: Parameter Order</div>
+        <p>In <code>reduce</code>, the parameters are <code>(item, accumulator)</code> &mdash; the <strong>accumulator is SECOND</strong>. This is the <strong>#1 confusion source</strong> in DataWeave:</p>
+        <ul>
+          <li><code>$</code> = current item (like <code>map</code> and <code>filter</code>)</li>
+          <li><code>$$</code> = <strong>accumulator</strong> (NOT the index like in <code>map</code>!)</li>
+        </ul>
+        <p>Always use named parameters <code>(item, acc = 0)</code> instead of <code>$</code>/<code>$$</code> to avoid confusion.</p>
+      </div>
+
+      <h3><code>groupBy</code> &mdash; Group Elements by Key</h3>
+      <!-- Snippet 7: groupBy -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+// groupBy returns an OBJECT, not an array!
+// Keys are the group values, values are arrays of matching items
+payload groupBy $.industry
+
+// Result shape:
+// {
+//   "Technology": [customer1, customer2, ...],
+//   "Healthcare": [customer3, ...],
+//   ...
+// }</code></pre>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">groupBy Returns an Object!</div>
+        <p><code>groupBy</code> returns an <strong>Object</strong> with keys as group names and values as arrays. You cannot <code>map</code> over an Object &mdash; use <code>pluck</code> or <code>mapObject</code> to iterate the result. The keys are of type <code>Key</code>; cast with <code>as String</code> for clean output.</p>
+      </div>
+
+      <h3><code>distinctBy</code> &mdash; Remove Duplicates</h3>
+      <!-- Snippet 8: distinctBy -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+// Remove duplicate customers by ID
+payload distinctBy $.id
+
+// Remove duplicates by compound key
+payload distinctBy ($.firstName ++ $.lastName)</code></pre>
+
+      <h3><code>flatten</code> &mdash; Flatten Nested Arrays</h3>
+      <!-- Snippet 9: flatten -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+// flatten removes ONE level of nesting
+flatten([[1, 2], [3, 4], [5]])
+// Result: [1, 2, 3, 4, 5]
+
+// For deeper nesting, use flatMap:
+// payload flatMap ((order) -> order.lineItems map ((item) -> { ... }))</code></pre>
+
+      <h3><code>mapObject</code> and <code>pluck</code></h3>
+      <p><code>mapObject</code> transforms an object&rsquo;s key-value pairs into a new object. <code>pluck</code> converts an object into an array. Both use <code>(value, key, index)</code> parameter order &mdash; value is FIRST.</p>
+
+      <!-- Snippet 10: mapObject and pluck -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+
+var grouped = payload groupBy $.industry
+---
+// pluck: Object -> Array (value, key, index)
+grouped pluck ((customers, industry) -> {
+  industry: industry as String,
+  count: sizeOf(customers),
+  companies: customers map $.company
+})
+
+// mapObject: Object -> Object (value, key, index)
+// grouped mapObject ((customers, industry) -> {
+//   (industry): sizeOf(customers)
+// })</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">mapObject vs pluck</div>
+        <p><code>mapObject</code> returns an <strong>Object</strong> (same structure, transformed keys/values). <code>pluck</code> returns an <strong>Array</strong> (converts object entries to array elements). Use <code>pluck</code> when you need to convert grouped results back into a list.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 3: FORMAT CONVERSIONS & NULL HANDLING                  -->
+    <!-- ============================================================ -->
+    <section id="formats-nulls">
+      <h2>Section 3: Format Conversions &amp; Null Handling (10 min)</h2>
+
+      <p>One of DataWeave&rsquo;s superpowers is format conversion. You can transform between JSON, XML, CSV, and other formats simply by changing the <code>output</code> directive. The DataWeave engine handles serialization automatically.</p>
+
+      <h3>JSON to CSV</h3>
+      <!-- Snippet 11: JSON to CSV -->
+      <div class="code-compare">
+        <div class="code-panel">
+          <h4>Input (JSON)</h4>
+          <pre class="language-json"><code class="language-json">[
+  {"name": "Leanne", "company": "Romaguera-Crona", "score": 85},
+  {"name": "Ervin", "company": "Deckow-Crist", "score": 72}
+]</code></pre>
+        </div>
+        <div class="code-panel">
+          <h4>DataWeave &rarr; CSV output</h4>
+          <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/csv
+---
+payload</code></pre>
+        </div>
+      </div>
+      <p>That&rsquo;s it &mdash; just change <code>output application/csv</code> and DataWeave generates CSV headers from the object keys automatically. No column mapping needed.</p>
+
+      <div class="callout callout-danger">
+        <div class="callout-title">CSV Values Are ALL Strings!</div>
+        <p>When <strong>reading</strong> CSV, all values come in as strings &mdash; even numbers. If you need to do arithmetic, you <strong>must</strong> coerce with <code>as Number</code>:</p>
+        <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// WRONG: string concatenation, not addition
+$.amount + $.tax  // "1500.00800.00"
+
+// RIGHT: coerce first
+($.amount as Number) + ($.tax as Number)  // 2300.00</code></pre>
+      </div>
+
+      <h3>Null Handling</h3>
+      <p>Null values are inevitable in real-world data. DataWeave provides the <code>default</code> operator and <code>skipNullOn</code> output directive to handle them cleanly.</p>
+
+      <!-- Snippet 12: Null handling -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+  // "default" triggers on null AND missing fields
+  email: payload.email default "unknown@example.com",
+
+  // Chain defaults for fallback
+  phone: payload.phone default payload.altPhone default "N/A",
+
+  // "default" does NOT trigger on "", 0, false, or []
+  company: payload.company default "Unaffiliated",
+
+  // skipNullOn="everywhere" removes null keys from output
+  optionalField: payload.maybeNull
+}</code></pre>
+
+      <h3>Pattern Matching</h3>
+      <p>For complex conditional logic, DataWeave&rsquo;s <code>match</code> expression is cleaner than nested <code>if</code>/<code>else</code>.</p>
+
+      <!-- Snippet 13: Pattern matching -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+payload map ((customer) -> {
+  name: customer.firstName,
+  tier: customer.score match {
+    case score if score > 80 -> "premium"
+    case score if score > 50 -> "standard"
+    else -> "basic"
+  }
+})</code></pre>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 4: REUSABLE MODULES                                   -->
+    <!-- ============================================================ -->
+    <section id="modules">
+      <h2>Section 4: Reusable Modules (10 min)</h2>
+
+      <p>As your DataWeave transforms grow, you&rsquo;ll want to share functions across multiple flows. DataWeave modules let you define reusable functions, types, and variables in <code>.dwl</code> files that any transform can import.</p>
+
+      <!-- Diagram 2: Shared Module -->
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+  M["customer-utils.dwl<br/><i>normalizePhone()</i><br/><i>classifySegment()</i><br/><i>mergeCustomer()</i>"]
+  F1["Flow 1:<br/>Customer Enrichment"] -->|"import"| M
+  F2["Flow 2:<br/>Batch ETL"] -->|"import"| M
+  F3["Flow 3:<br/>Score Update"] -->|"import"| M
+
+  style M fill:#00A1E0,stroke:#0078D4,color:#fff
+  style F1 fill:#1A1F36,stroke:#8B949E,color:#fff
+  style F2 fill:#1A1F36,stroke:#8B949E,color:#fff
+  style F3 fill:#1A1F36,stroke:#8B949E,color:#fff
+        </pre>
+        <p class="diagram-caption">Figure 2: A shared DataWeave module provides reusable functions across multiple flows</p>
+      </div>
+
+      <h3>Defining a Module</h3>
+      <!-- Snippet 14: Module definition -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// customer-utils.dwl — Module file
+// IMPORTANT: NO output directive, NO --- separator, NO body expression
+// Only function, variable, and type declarations
+%dw 2.0
+import mergeWith from dw::core::Objects
+
+fun normalizePhone(phone: String): String =
+  do {
+    var digits = phone replace /[^\d]/ with ""
+    ---
+    if (sizeOf(digits) == 10)
+      "(" ++ digits[0 to 2] ++ ") " ++ digits[3 to 5] ++ "-" ++ digits[6 to 9]
+    else
+      phone
+  }
+
+fun classifySegment(score: Number): String =
+  if (score > 80) "premium"
+  else if (score > 50) "standard"
+  else "basic"
+
+fun mergeCustomer(source: Object, enrichment: Object): Object =
+  enrichment mergeWith source</code></pre>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Module File Rules</div>
+        <p>Module <code>.dwl</code> files have <strong>NO <code>output</code> directive</strong>, <strong>NO <code>---</code> separator</strong>, and <strong>NO body expression</strong>. They only contain <code>%dw 2.0</code>, imports, <code>fun</code>, <code>var</code>, <code>type</code>, and <code>ns</code> declarations. If you include <code>output</code> or <code>---</code>, the module will fail to parse.</p>
+      </div>
+
+      <h3>Importing a Module</h3>
+      <!-- Snippet 15: Module import -->
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+
+// Import specific functions from your module
+import normalizePhone, classifySegment from modules::customer-utils
+
+// Or import everything
+// import * from modules::customer-utils
+---
+payload map ((customer) -> {
+  name: customer.firstName ++ " " ++ customer.lastName,
+  phone: normalizePhone(customer.phone),
+  segment: classifySegment(customer.score)
+})</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title"><code>mergeWith</code> Direction</div>
+        <p><code>mergeWith</code> from <code>dw::core::Objects</code> merges two objects. The <strong>second argument wins</strong> on conflicts. So <code>enrichment mergeWith source</code> means source fields override enrichment fields on any shared keys. This is the opposite of what you might expect!</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 5: DEMO — DW PLAYGROUND LIVE                          -->
+    <!-- ============================================================ -->
+    <section id="demo">
+      <h2>Section 5: Demo &mdash; DW Playground Live (15 min)</h2>
+
+      <p>Let&rsquo;s put these concepts together with five quick demos in the Playground. Each demo builds on the previous one.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 6: LAB 1 — BASICS                                     -->
+    <!-- ============================================================ -->
+    <section id="lab-basics" class="lab-section">
+      <h2>Lab 1: DataWeave Basics (90 min)</h2>
+      <p><span class="stage-badge stage-playground">Stage 1: DW Playground</span> &mdash; All five exercises run entirely in the <a href="https://dataweave.mulesoft.com/" target="_blank">DataWeave Playground</a>. Open it now and keep it in a separate tab.</p>
+
+      <p>For each exercise: paste the input data into the Input panel, write your DataWeave in the Script panel, and compare the Output panel against the expected result. Starter <code>.dwl</code> files are in <code>lab-basics/starter/</code> with TODO comments to guide you.</p>
+
+      <!-- Exercise 1 -->
+      <div class="exercise-card">
+        <h3>Exercise 1: Filter &amp; Map (JSON &rarr; JSON)</h3>
+        <p><strong>File:</strong> <code>lab-basics/starter/ex1-filter-map.dwl</code></p>
+        <p><strong>Task:</strong> Filter the 10 customers to keep only <code>industry == "Technology"</code>, then map each to an object with <code>fullName</code>, <code>email</code>, and <code>company</code>.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex1-input.json (10 customers)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"id":"ACCT-001","firstName":"Leanne","lastName":"Graham","email":"leanne.graham@romaguera.com","phone":"(512) 555-0101","company":"Romaguera-Crona","industry":"Technology"},
+  {"id":"ACCT-002","firstName":"Ervin","lastName":"Howell","email":"ervin.howell@deckow.com","phone":"(415) 555-0102","company":"Deckow-Crist","industry":"Technology"},
+  {"id":"ACCT-003","firstName":"Clementine","lastName":"Bauch","email":"clementine.bauch@keebler.com","phone":"(617) 555-0103","company":"Keebler LLC","industry":"Healthcare"},
+  {"id":"ACCT-004","firstName":"Patricia","lastName":"Lebsack","email":"patricia.lebsack@robel.com","phone":"(206) 555-0104","company":"Robel-Corkery","industry":"Technology"},
+  {"id":"ACCT-005","firstName":"Chelsey","lastName":"Dietrich","email":"chelsey.dietrich@considine.com","phone":"(312) 555-0105","company":"Considine-Lockman","industry":"Financial Services"},
+  {"id":"ACCT-006","firstName":"Dennis","lastName":"Schulist","email":"dennis.schulist@kulas.com","phone":"(313) 555-0106","company":"Kulas Light Inc","industry":"Manufacturing"},
+  {"id":"ACCT-007","firstName":"Kurtis","lastName":"Weissnat","email":"kurtis.weissnat@hoeger.com","phone":"(303) 555-0107","company":"Hoeger LLC","industry":"Technology"},
+  {"id":"ACCT-008","firstName":"Nicholas","lastName":"Runolfsdottir","email":"nicholas.runolfsdottir@stanton.com","phone":"(615) 555-0108","company":"Stanton Group","industry":"Healthcare"},
+  {"id":"ACCT-009","firstName":"Glenna","lastName":"Reichert","email":"glenna.reichert@yost.com","phone":"(503) 555-0109","company":"Yost Partners","industry":"Retail"},
+  {"id":"ACCT-010","firstName":"Clementina","lastName":"DuBuque","email":"clementina.dubuque@mclaughlin.com","phone":"(704) 555-0110","company":"McLaughlin &amp; Sons","industry":"Financial Services"}
+]</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Expected Output: ex1-expected.json (4 records)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"fullName": "Leanne Graham", "email": "leanne.graham@romaguera.com", "company": "Romaguera-Crona"},
+  {"fullName": "Ervin Howell", "email": "ervin.howell@deckow.com", "company": "Deckow-Crist"},
+  {"fullName": "Patricia Lebsack", "email": "patricia.lebsack@robel.com", "company": "Robel-Corkery"},
+  {"fullName": "Kurtis Weissnat", "email": "kurtis.weissnat@hoeger.com", "company": "Hoeger LLC"}
+]</code></pre>
+        </details>
+
+        <div class="validation">Validation: Output is a JSON array with exactly 4 objects. Each has <code>fullName</code> (first + space + last), <code>email</code>, and <code>company</code>. Only Technology industry customers appear.</div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="exercise-card">
+        <h3>Exercise 2: Flatten to CSV (JSON &rarr; CSV)</h3>
+        <p><strong>File:</strong> <code>lab-basics/starter/ex2-flatten-csv.dwl</code></p>
+        <p><strong>Task:</strong> Flatten 5 orders with nested <code>lineItems</code> (3 items each) into a flat CSV with columns: <code>orderId</code>, <code>customerName</code>, <code>orderDate</code>, <code>itemName</code>, <code>quantity</code>, <code>price</code>.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex2-input.json (5 orders with nested lineItems)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"orderId":"ORD-1001","customerName":"Romaguera-Crona","orderDate":"2026-01-15","lineItems":[
+    {"itemName":"API Gateway License","quantity":2,"price":1500.00},
+    {"itemName":"Integration Platform","quantity":1,"price":4500.00},
+    {"itemName":"Support Package","quantity":1,"price":800.00}
+  ]},
+  {"orderId":"ORD-1002","customerName":"Deckow-Crist","orderDate":"2026-01-18","lineItems":[
+    {"itemName":"Data Connector","quantity":5,"price":350.00},
+    {"itemName":"Monitoring Dashboard","quantity":1,"price":1200.00},
+    {"itemName":"API Designer Tool","quantity":3,"price":600.00}
+  ]}
+]</code></pre>
+          <p><em>(3 more orders in the full file &mdash; see fixtures/ex2-input.json)</em></p>
+        </details>
+
+        <div class="callout callout-info">
+          <div class="callout-title">Hint: flatMap</div>
+          <p>Use <code>flatMap</code> to iterate over orders, and <code>map</code> inside to iterate over each order&rsquo;s <code>lineItems</code>. <code>flatMap</code> automatically flattens the result &mdash; no extra <code>flatten</code> needed.</p>
+        </div>
+
+        <div class="validation">Validation: Output is CSV with a header row plus 15 data rows (5 orders &times; 3 line items). First row after header: <code>ORD-1001,Romaguera-Crona,2026-01-15,API Gateway License,2,1500.00</code></div>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="exercise-card">
+        <h3>Exercise 3: Group &amp; Aggregate (CSV &rarr; JSON)</h3>
+        <p><strong>File:</strong> <code>lab-basics/starter/ex3-group-aggregate.dwl</code></p>
+        <p><strong>Task:</strong> Read 20 sales records from CSV, group by <code>customerName</code>, and calculate <code>totalAmount</code> and <code>orderCount</code> per customer.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex3-input.csv (20 sales records)</summary>
+          <pre class="language-javascript"><code class="language-javascript">orderId,customerName,product,amount,orderDate
+ORD-2001,Romaguera-Crona,API Gateway License,1500.00,2026-01-05
+ORD-2002,Romaguera-Crona,Support Package,800.00,2026-01-12
+ORD-2003,Deckow-Crist,Data Connector,350.00,2026-01-08
+ORD-2004,Keebler LLC,HIPAA Compliance Module,3200.00,2026-01-10
+ORD-2005,Deckow-Crist,Monitoring Dashboard,1200.00,2026-01-14
+... (20 rows total)</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Expected Output: ex3-expected.json (5 customer summaries)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"customerName": "Romaguera-Crona", "totalAmount": 8350.00, "orderCount": 5},
+  {"customerName": "Deckow-Crist", "totalAmount": 2950.00, "orderCount": 4},
+  {"customerName": "Keebler LLC", "totalAmount": 5250.00, "orderCount": 4},
+  {"customerName": "Considine-Lockman", "totalAmount": 5900.00, "orderCount": 4},
+  {"customerName": "Hoeger LLC", "totalAmount": 4450.00, "orderCount": 3}
+]</code></pre>
+        </details>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">CSV String Trap!</div>
+          <p>Remember: CSV amounts are <strong>strings</strong>. You must coerce with <code>item.amount as Number</code> inside your reduce. Without coercion, you get string concatenation instead of addition.</p>
+        </div>
+
+        <div class="validation">Validation: Output is a JSON array with 5 objects. Romaguera-Crona has <code>totalAmount: 8350.00</code> and <code>orderCount: 5</code>. All amounts are numbers, not strings.</div>
+      </div>
+
+      <!-- Exercise 4 -->
+      <div class="exercise-card">
+        <h3>Exercise 4: Null Handling (JSON &rarr; JSON)</h3>
+        <p><strong>File:</strong> <code>lab-basics/starter/ex4-null-handling.dwl</code></p>
+        <p><strong>Task:</strong> Process 8 customer records with strategic nulls and missing fields. Apply defaults and produce clean output with all fields populated.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex4-input.json (8 records with nulls/missing fields)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"id":"ACCT-001","firstName":"Leanne","lastName":"Graham","email":"leanne.graham@romaguera.com","phone":"(512) 555-0101","company":"Romaguera-Crona"},
+  {"id":"ACCT-002","firstName":"Ervin","lastName":"Howell","email":null,"phone":"(415) 555-0102","company":"Deckow-Crist"},
+  {"id":"ACCT-003","firstName":"Clementine","lastName":"Bauch","email":"clementine.bauch@keebler.com","phone":null,"company":null},
+  {"id":"ACCT-004","firstName":"Patricia","lastName":"Lebsack","company":"Robel-Corkery"},
+  {"id":"ACCT-005","firstName":"Chelsey","lastName":"Dietrich","email":null,"phone":null,"company":null},
+  {"id":"ACCT-006","firstName":"Dennis","lastName":"Schulist","email":"dennis.schulist@kulas.com","company":"Kulas Light Inc"},
+  {"id":"ACCT-007","firstName":"Kurtis","lastName":"Weissnat","email":"kurtis.weissnat@hoeger.com","phone":"(303) 555-0107"},
+  {"id":"ACCT-008","firstName":"Nicholas","lastName":"Runolfsdottir","email":null,"phone":"(615) 555-0108","company":"Stanton Group"}
+]</code></pre>
+        </details>
+
+        <div class="callout callout-info">
+          <div class="callout-title">Default Rules</div>
+          <p>Use these defaults: email &rarr; <code>"unknown@example.com"</code>, phone &rarr; <code>"N/A"</code>, company &rarr; <code>"Unaffiliated"</code>. Add <code>skipNullOn="everywhere"</code> to the output directive.</p>
+        </div>
+
+        <div class="validation">Validation: All 8 records have <code>id</code>, <code>fullName</code>, <code>email</code>, <code>phone</code>, and <code>company</code>. ACCT-002 email = &ldquo;unknown@example.com&rdquo;. ACCT-004 phone = &ldquo;N/A&rdquo; (field was missing entirely). No null values anywhere.</div>
+      </div>
+
+      <!-- Exercise 5 -->
+      <div class="exercise-card">
+        <h3>Exercise 5: XML to JSON (XML &rarr; JSON)</h3>
+        <p><strong>File:</strong> <code>lab-basics/starter/ex5-xml-to-json.dwl</code></p>
+        <p><strong>Task:</strong> Flatten a 2-level nested XML product catalog into a flat array of products, each with its parent <code>categoryName</code>.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex5-input.xml (nested catalog)</summary>
+          <pre class="language-xml"><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;catalog&gt;
+  &lt;category name="Integration"&gt;
+    &lt;category name="API Management"&gt;
+      &lt;product id="PROD-101" price="1500.00"&gt;API Gateway License&lt;/product&gt;
+      &lt;product id="PROD-102" price="600.00"&gt;API Designer Tool&lt;/product&gt;
+      &lt;product id="PROD-103" price="1200.00"&gt;API Monitoring Suite&lt;/product&gt;
+    &lt;/category&gt;
+    &lt;category name="Connectors"&gt;
+      &lt;product id="PROD-201" price="350.00"&gt;Data Connector&lt;/product&gt;
+      ...
+    &lt;/category&gt;
+  &lt;/category&gt;
+  &lt;category name="Security"&gt;
+    ...
+  &lt;/category&gt;
+&lt;/catalog&gt;</code></pre>
+        </details>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">XML Selector Gotchas</div>
+          <p><code>.category</code> returns only the <strong>first</strong> match. Use <code>.*category</code> (multi-value selector) to get <strong>all</strong> repeated elements as an array. Use <code>.@name</code> to read XML attributes. The product text content is accessed with <code>prod as String</code>.</p>
+        </div>
+
+        <div class="validation">Validation: Output is a JSON array with exactly 12 product objects. Each has <code>productId</code>, <code>name</code>, <code>price</code> (number), and <code>categoryName</code>. First product: PROD-101, &ldquo;API Gateway License&rdquo;, 1500.00, &ldquo;API Management&rdquo;.</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 7: LAB 2 — ADVANCED                                   -->
+    <!-- ============================================================ -->
+    <section id="lab-advanced" class="lab-section lab-section-advanced">
+      <h2>Lab 2: DataWeave Advanced (60 min)</h2>
+      <p><span class="stage-badge stage-playground">Stage 1</span> for Exercises 6&ndash;8, <span class="stage-badge stage-acb">Stage 2</span> for Exercise 9. These exercises combine multiple concepts and introduce reusable modules.</p>
+
+      <!-- Exercise 6 -->
+      <div class="exercise-card">
+        <h3>Exercise 6: Reusable Module &mdash; customer-utils.dwl</h3>
+        <p><strong>File:</strong> <code>lab-advanced/starter/ex6-customer-utils.dwl</code></p>
+        <p><strong>Task:</strong> Create a DataWeave module with three reusable functions. This module will be used in Exercise 9 and later in Module 6.</p>
+
+        <p><strong>Functions to implement:</strong></p>
+        <ol>
+          <li><code>normalizePhone(phone: String): String</code> &mdash; Strip non-digits, format as <code>(XXX) XXX-XXXX</code> for 10-digit numbers. 11-digit numbers starting with &ldquo;1&rdquo; strip the leading 1 first. Anything else returns the original string.</li>
+          <li><code>classifySegment(score: Number): String</code> &mdash; Returns &ldquo;premium&rdquo; (>80), &ldquo;standard&rdquo; (>50), or &ldquo;basic&rdquo;.</li>
+          <li><code>mergeCustomer(source: Object, enrichment: Object): Object</code> &mdash; Merge using <code>mergeWith</code> where source fields win on conflicts.</li>
+        </ol>
+
+        <details class="fixture-toggle">
+          <summary>View Test Data: ex6-phone-tests.json</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"input": "(512) 555-0101", "expected": "(512) 555-0101"},
+  {"input": "5125550101", "expected": "(512) 555-0101"},
+  {"input": "512-555-0101", "expected": "(512) 555-0101"},
+  {"input": "+1 512 555 0101", "expected": "(512) 555-0101"},
+  {"input": "15125550101", "expected": "(512) 555-0101"},
+  {"input": "123", "expected": "123"}
+]</code></pre>
+        </details>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Module File Rules (Again!)</div>
+          <p>Remember: <strong>NO <code>output</code></strong>, <strong>NO <code>---</code></strong>, <strong>NO body expression</strong>. Only <code>%dw 2.0</code>, imports, and function declarations. To test in the Playground, write a <em>separate</em> test script that copies the functions and calls them.</p>
+        </div>
+
+        <div class="validation">Validation: <code>normalizePhone("5125550101")</code> returns <code>"(512) 555-0101"</code>. <code>normalizePhone("15125550101")</code> returns <code>"(512) 555-0101"</code>. <code>classifySegment(85)</code> returns <code>"premium"</code>. <code>mergeCustomer({a: 1, b: 2}, {b: 99, c: 3})</code> returns <code>{a: 1, b: 2, c: 3}</code> (source wins).</div>
+      </div>
+
+      <!-- Exercise 7 -->
+      <div class="exercise-card">
+        <h3>Exercise 7: Recursive Flatten (JSON &rarr; JSON) &mdash; CHALLENGE</h3>
+        <p><strong>File:</strong> <code>lab-advanced/starter/ex7-recursive-flatten.dwl</code></p>
+        <p><strong>Task:</strong> Recursively flatten a nested organization hierarchy into a flat array with <code>parentId</code> references.</p>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">Challenge Exercise</div>
+          <p>Recursion in DataWeave is hard. The starter file provides the function signature and a skeleton. Take it step by step: first handle the base case (no reports), then add the recursive case. If you get stuck after 15 minutes, check the solution file.</p>
+        </div>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex7-input.json (org hierarchy, 4 levels)</summary>
+          <pre class="language-json"><code class="language-json">{
+  "org": [{
+    "id": "EMP-001", "name": "Sarah Chen", "title": "CEO",
+    "reports": [
+      {"id": "EMP-002", "name": "Marcus Johnson", "title": "VP Engineering",
+        "reports": [
+          {"id": "EMP-005", "name": "Priya Patel", "title": "Director of Platform",
+            "reports": [
+              {"id": "EMP-008", "name": "Alex Rivera", "title": "Senior Engineer"},
+              {"id": "EMP-009", "name": "Jordan Kim", "title": "Engineer"}
+            ]},
+          {"id": "EMP-006", "name": "David Okafor", "title": "Director of QA"}
+        ]},
+      {"id": "EMP-003", "name": "Lisa Yamamoto", "title": "VP Sales",
+        "reports": [
+          {"id": "EMP-007", "name": "Carlos Mendez", "title": "Regional Manager"}
+        ]},
+      {"id": "EMP-004", "name": "James Wright", "title": "VP Operations",
+        "reports": [
+          {"id": "EMP-010", "name": "Nina Kowalski", "title": "Operations Manager"}
+        ]}
+    ]
+  }]
+}</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Expected Output: ex7-expected.json (10 flat records)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"id": "EMP-001", "name": "Sarah Chen", "title": "CEO", "parentId": null},
+  {"id": "EMP-002", "name": "Marcus Johnson", "title": "VP Engineering", "parentId": "EMP-001"},
+  {"id": "EMP-005", "name": "Priya Patel", "title": "Director of Platform", "parentId": "EMP-002"},
+  {"id": "EMP-008", "name": "Alex Rivera", "title": "Senior Engineer", "parentId": "EMP-005"},
+  {"id": "EMP-009", "name": "Jordan Kim", "title": "Engineer", "parentId": "EMP-005"},
+  {"id": "EMP-006", "name": "David Okafor", "title": "Director of QA", "parentId": "EMP-002"},
+  {"id": "EMP-003", "name": "Lisa Yamamoto", "title": "VP Sales", "parentId": "EMP-001"},
+  {"id": "EMP-007", "name": "Carlos Mendez", "title": "Regional Manager", "parentId": "EMP-003"},
+  {"id": "EMP-004", "name": "James Wright", "title": "VP Operations", "parentId": "EMP-001"},
+  {"id": "EMP-010", "name": "Nina Kowalski", "title": "Operations Manager", "parentId": "EMP-004"}
+]</code></pre>
+        </details>
+
+        <div class="validation">Validation: Output is a JSON array with exactly 10 records. CEO has <code>parentId: null</code>. EMP-005 has <code>parentId: "EMP-002"</code>. EMP-009 has <code>parentId: "EMP-005"</code>. Order is depth-first (CEO &rarr; VP Eng &rarr; Dir Platform &rarr; engineers &rarr; Dir QA &rarr; VP Sales &rarr; ...).</div>
+      </div>
+
+      <!-- Exercise 8 -->
+      <div class="exercise-card">
+        <h3>Exercise 8: Dynamic Keys &amp; Average (JSON &rarr; JSON)</h3>
+        <p><strong>File:</strong> <code>lab-advanced/starter/ex8-pivot-average.dwl</code></p>
+        <p><strong>Task:</strong> Pivot 30 survey responses (6 questions &times; 5 respondents) into a single object where keys are question IDs and values are average scores.</p>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex8-input.json (30 survey responses)</summary>
+          <pre class="language-json"><code class="language-json">[
+  {"respondentId": "R-001", "questionId": "q1", "questionText": "Overall satisfaction", "score": 5},
+  {"respondentId": "R-001", "questionId": "q2", "questionText": "Ease of integration", "score": 4},
+  {"respondentId": "R-001", "questionId": "q3", "questionText": "Documentation quality", "score": 3},
+  ... (30 rows total)
+]</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Expected Output: ex8-expected.json</summary>
+          <pre class="language-json"><code class="language-json">{
+  "q1": 4.2,
+  "q2": 3.8,
+  "q3": 3.2,
+  "q4": 3.8,
+  "q5": 3.8,
+  "q6": 4.0
+}</code></pre>
+        </details>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Dynamic Key Syntax</div>
+          <p>To use a variable as an object key, wrap it in parentheses: <code>{ (questionId): avgScore }</code>. Without parentheses, DataWeave creates a literal key named &ldquo;questionId&rdquo;. Also: <code>avg</code> is available from <code>dw::core::Arrays</code> &mdash; import it in the header.</p>
+        </div>
+
+        <div class="validation">Validation: Output is a single JSON object (not an array) with 6 keys: q1 through q6. Values are decimals: q1 = 4.2, q3 = 3.2, q6 = 4.0.</div>
+      </div>
+
+      <!-- Exercise 9 -->
+      <div class="exercise-card">
+        <h3>Exercise 9: Merge Transform Capstone (3 JSON &rarr; 1 JSON)</h3>
+        <p><span class="stage-badge stage-acb">Stage 2: ACB</span> &mdash; This exercise bridges back to Module 4.</p>
+        <p><strong>File:</strong> <code>lab-advanced/starter/ex9-merge-capstone.dwl</code></p>
+        <p><strong>Task:</strong> Merge three data sources into a single enriched customer record &mdash; just like the Scatter-Gather merge from Module 4, but now with your own reusable functions.</p>
+
+        <p><strong>Three input sources:</strong></p>
+        <ul>
+          <li><strong>ex9-company.json</strong> &mdash; REST enrichment data (company details)</li>
+          <li><strong>ex9-address.json</strong> &mdash; SOAP validation result (standardized address)</li>
+          <li><strong>ex9-score.json</strong> &mdash; Database query result (credit score)</li>
+        </ul>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex9-company.json (REST shape)</summary>
+          <pre class="language-json"><code class="language-json">{
+  "customerId": "ACCT-001",
+  "companyName": "Romaguera-Crona",
+  "industry": "Technology",
+  "employeeCount": 2500,
+  "revenue": 450000000,
+  "headquarters": "Austin, TX",
+  "founded": 2008,
+  "website": "https://romaguera-crona.example.com"
+}</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex9-address.json (SOAP shape)</summary>
+          <pre class="language-json"><code class="language-json">{
+  "validationResult": {
+    "status": "VALID",
+    "standardizedAddress": {
+      "street": "742 Evergreen Terrace",
+      "city": "Austin", "state": "TX",
+      "postalCode": "78701", "country": "US"
+    },
+    "deliverability": "DELIVERABLE",
+    "validatedAt": "2026-02-23T10:30:00Z"
+  }
+}</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Input: ex9-score.json (DB shape)</summary>
+          <pre class="language-json"><code class="language-json">{
+  "customer_id": "ACCT-001",
+  "score": 85,
+  "segment": "premium",
+  "last_updated": "2026-02-20T14:00:00Z"
+}</code></pre>
+        </details>
+
+        <details class="fixture-toggle">
+          <summary>View Expected Output: ex9-expected.json</summary>
+          <pre class="language-json"><code class="language-json">{
+  "customerId": "ACCT-001",
+  "companyName": "Romaguera-Crona",
+  "industry": "Technology",
+  "employeeCount": 2500,
+  "revenue": 450000000,
+  "headquarters": "Austin, TX",
+  "founded": 2008,
+  "website": "https://romaguera-crona.example.com",
+  "address": {
+    "street": "742 Evergreen Terrace",
+    "city": "Austin",
+    "state": "TX",
+    "postalCode": "78701",
+    "country": "US",
+    "validated": true,
+    "deliverability": "DELIVERABLE"
+  },
+  "creditScore": 85,
+  "segment": "premium",
+  "lastScoreUpdate": "2026-02-20T14:00:00Z"
+}</code></pre>
+        </details>
+
+        <div class="callout callout-info">
+          <div class="callout-title">Playground vs ACB Approach</div>
+          <p><strong>In the Playground:</strong> Paste functions inline and use <code>var</code> declarations to hold each input source. <strong>In ACB:</strong> Import functions from <code>customer-utils.dwl</code> and use <code>readUrl("classpath://...")</code> to load fixture data. The ACB approach mirrors how you&rsquo;d do it in a real Mule flow.</p>
+        </div>
+
+        <div class="validation">Validation: Output is a single JSON object with all company fields, a nested <code>address</code> object with <code>validated: true</code>, and <code>creditScore: 85</code> with <code>segment: "premium"</code> (from classifySegment function).</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 8: LAB 3 — MULE FLOW                                 -->
+    <!-- ============================================================ -->
+    <section id="lab-modular" class="lab-section">
+      <h2>Lab 3: DataWeave in a Mule Flow (30 min)</h2>
+      <p><span class="stage-badge stage-mule">Stage 3: Mule Flow</span> &mdash; You&rsquo;ve mastered DataWeave in the Playground and ACB. Now you&rsquo;ll apply it where it matters most: inside a real Mule project.</p>
+
+      <p>Remember the Customer Enrichment Engine you built in Module 4? The Scatter-Gather merge transform has an 18-line inline DataWeave block that hardcodes all field mapping, ignores null values, and doesn&rsquo;t use your reusable <code>customer-utils.dwl</code> module. Time to fix that.</p>
+
+      <!-- Diagram: External DW Files Pattern -->
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph MuleFlow["implementation.xml"]
+      SG["Scatter-Gather&lt;br/&gt;3 parallel routes"]
+      TM["Transform Message&lt;br/&gt;resource=dwl/enrich-merge.dwl"]
+      SG -->|"merged payload"| TM
+    end
+
+    subgraph DWL["src/main/resources/dwl/"]
+      EM["enrich-merge.dwl&lt;br/&gt;import from modules::customer-utils"]
+      subgraph Modules["modules/"]
+        CU["customer-utils.dwl&lt;br/&gt;normalizePhone&amp;#40;&amp;#41;&lt;br/&gt;classifySegment&amp;#40;&amp;#41;"]
+      end
+      EM -->|"import"| CU
+    end
+
+    TM -->|"resource attr"| EM
+
+    style MuleFlow fill:#1A1F36,stroke:#8B949E,color:#fff
+    style DWL fill:#00A1E0,stroke:#0078D4,color:#fff
+    style Modules fill:#7C3AED,stroke:#6D28D9,color:#fff
+    style SG fill:#2D333B,stroke:#8B949E,color:#fff
+    style TM fill:#2D333B,stroke:#8B949E,color:#fff
+    style EM fill:#0078D4,stroke:#00A1E0,color:#fff
+    style CU fill:#6D28D9,stroke:#7C3AED,color:#fff
+        </pre>
+        <p class="diagram-caption">Figure 3: External DataWeave files referenced from Mule XML via the <code>resource</code> attribute</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">The <code>resource</code> Attribute</div>
+        <p>Instead of inline CDATA DataWeave, the <code>ee:set-payload</code> component supports a <code>resource</code> attribute that points to an external <code>.dwl</code> file relative to <code>src/main/resources/</code>:</p>
+<pre class="language-xml"><code class="language-xml">&lt;!-- Before: inline DataWeave --&gt;
+&lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{ ... long transform ... }]]&gt;&lt;/ee:set-payload&gt;
+
+&lt;!-- After: external file --&gt;
+&lt;ee:set-payload resource="dwl/enrich-merge.dwl" /&gt;</code></pre>
+        <p>The external <code>.dwl</code> file is a complete DataWeave script (with <code>%dw 2.0</code>, <code>output</code>, <code>---</code>, and body). It can import modules using the same <code>import ... from modules::module-name</code> syntax you learned in Exercise 6.</p>
+      </div>
+
+      <!-- Exercise 10 -->
+      <div class="exercise-card">
+        <h3>Exercise 10: Refactor the Scatter-Gather Merge</h3>
+        <p><strong>Starter project:</strong> <code>lab-modular/starter/customer-system-api/</code></p>
+        <p><strong>Task:</strong> Extract the Scatter-Gather merge transform into an external <code>.dwl</code> file, import your <code>customer-utils.dwl</code> module, and add null handling.</p>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Open the Starter Project in ACB</h4>
+            <p>Open the <code>lab-modular/starter/customer-system-api/</code> project in Anypoint Code Builder. This is the Module 4 cycle-9 project with a TODO comment in the Scatter-Gather merge.</p>
+            <p>Look at <code>src/main/mule/implementation.xml</code> &mdash; find the <code>TODO 1</code> comment inside the <code>&lt;otherwise&gt;</code> block of the Choice router.</p>
+            <div class="validation">Validation: You can see the inline DataWeave in the Scatter-Gather merge. Note that it hardcodes field mapping with no null handling and no reusable functions.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Add customer-utils.dwl to the Project</h4>
+            <p>Copy your Exercise 6 solution (<code>customer-utils.dwl</code>) into <code>src/main/resources/dwl/modules/customer-utils.dwl</code>.</p>
+            <p>If you don&rsquo;t have your Exercise 6 solution handy, use the one from <code>lab-advanced/solution/ex6-customer-utils.dwl</code>.</p>
+<pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// customer-utils.dwl — NO output, NO ---, NO body
+%dw 2.0
+import mergeWith from dw::core::Objects
+
+fun normalizePhone(phone: String): String =
+  do {
+    var digits = phone replace /[^\d]/ with ""
+    ---
+    if (sizeOf(digits) == 10)
+      "(" ++ digits[0 to 2] ++ ") " ++ digits[3 to 5] ++ "-" ++ digits[6 to 9]
+    else if (sizeOf(digits) == 11 and digits[0] == "1")
+      "(" ++ digits[1 to 3] ++ ") " ++ digits[4 to 6] ++ "-" ++ digits[7 to 10]
+    else
+      phone
+  }
+
+fun classifySegment(score: Number): String =
+  if (score > 80) "premium"
+  else if (score > 50) "standard"
+  else "basic"
+
+fun mergeCustomer(source: Object, enrichment: Object): Object =
+  enrichment mergeWith source</code></pre>
+            <div class="validation">Validation: The file exists at <code>src/main/resources/dwl/modules/customer-utils.dwl</code> and has NO <code>output</code> directive, NO <code>---</code> separator.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Create enrich-merge.dwl</h4>
+            <p>Create a new file at <code>src/main/resources/dwl/enrich-merge.dwl</code>. This is the external DataWeave script that replaces the inline CDATA merge. Unlike the module file, this IS a full DataWeave script with <code>output</code> and <code>---</code>.</p>
+<pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json skipNullOn="everywhere"
+
+import normalizePhone, classifySegment from modules::customer-utils
+
+var enrichment = payload."0".payload
+var scoreData  = payload."1".payload[0]
+var address    = payload."2".payload
+---
+{
+    customerId:        vars.customerId,
+    company:           enrichment.companyName default "Unknown",
+    industry:          enrichment.industry default "Unknown",
+    employees:         enrichment.employeeCount,
+    revenue:           enrichment.revenue,
+    phone:             if (enrichment.phone != null)
+                         normalizePhone(enrichment.phone)
+                       else
+                         "N/A",
+    score:             scoreData.score,
+    segment:           classifySegment(scoreData.score default 0),
+    addressValid:      address.body.ValidateAddressResponse.isValid
+                         default false,
+    addressConfidence: address.body.ValidateAddressResponse.confidence
+                         default "NONE",
+    enrichedAt:        now()
+}</code></pre>
+            <div class="callout callout-warning">
+              <div class="callout-title">Module Script vs Transform Script</div>
+              <p><code>customer-utils.dwl</code> is a <strong>module</strong> (NO output, NO ---). <code>enrich-merge.dwl</code> is a <strong>transform script</strong> (HAS output, HAS ---). Don&rsquo;t confuse the two!</p>
+            </div>
+            <div class="validation">Validation: <code>enrich-merge.dwl</code> exists at <code>src/main/resources/dwl/enrich-merge.dwl</code>. It starts with <code>%dw 2.0</code>, has an <code>output</code> directive with <code>skipNullOn</code>, imports from <code>modules::customer-utils</code>, and accesses Scatter-Gather routes via <code>payload."0".payload</code>.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Wire the External File into implementation.xml</h4>
+            <p>In <code>implementation.xml</code>, find the <code>ee:transform</code> component for &ldquo;Merge all sources&rdquo; inside the <code>&lt;otherwise&gt;</code> block. Replace the entire <code>&lt;ee:set-payload&gt;...&lt;/ee:set-payload&gt;</code> element with:</p>
+<pre class="language-xml"><code class="language-xml">&lt;ee:set-payload resource="dwl/enrich-merge.dwl" /&gt;</code></pre>
+            <p>The <code>resource</code> path is relative to <code>src/main/resources/</code>. The full <code>ee:transform</code> block should now look like:</p>
+<pre class="language-xml"><code class="language-xml">&lt;ee:transform doc:name="Merge all sources"&gt;
+    &lt;ee:message&gt;
+        &lt;ee:set-payload resource="dwl/enrich-merge.dwl" /&gt;
+    &lt;/ee:message&gt;
+&lt;/ee:transform&gt;</code></pre>
+            <div class="validation">Validation: The <code>implementation.xml</code> no longer has inline CDATA for the merge transform. It references <code>dwl/enrich-merge.dwl</code> instead.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h4>Compare Before and After</h4>
+            <p>Review what you&rsquo;ve improved:</p>
+            <div class="comparison-table">
+              <table>
+                <thead>
+                  <tr><th>Aspect</th><th class="col-bad">Before (Cycle 9)</th><th class="col-good">After (Exercise 10)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Merge transform</td><td>18-line inline CDATA</td><td>1-line resource reference</td></tr>
+                  <tr><td>Null handling</td><td>None &mdash; crashes on missing data</td><td><code>default</code> operators + <code>skipNullOn</code></td></tr>
+                  <tr><td>Phone normalization</td><td>Not done</td><td><code>normalizePhone()</code> from module</td></tr>
+                  <tr><td>Segment classification</td><td>Raw DB value</td><td><code>classifySegment()</code> from module</td></tr>
+                  <tr><td>Reusability</td><td>Zero &mdash; copy-paste only</td><td>Shared module usable in Module 6 ETL</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="validation">Validation: Your project has 3 XML files in <code>src/main/mule/</code> (unchanged), 2 new <code>.dwl</code> files in <code>src/main/resources/dwl/</code>, and the merge transform in <code>implementation.xml</code> uses <code>resource="dwl/enrich-merge.dwl"</code>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CLOSING BANNER                                                -->
+    <!-- ============================================================ -->
+    <div class="closing-banner">
+      <h3>DataWeave Mastery Complete</h3>
+      <p>You progressed from the Playground to ACB to a real Mule flow. You can now write DataWeave transforms, convert between formats, handle nulls, build reusable modules, and wire external DW scripts into production Mule projects. These skills power every integration you&rsquo;ll build in MuleSoft.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- FOOTER                                                        -->
+    <!-- ============================================================ -->
+    <footer class="module-footer">
+      <a href="../04-integrations-rest-soap-db/module-04.html">&larr; Module 4: Building the Customer Enrichment Engine</a>
+      <a href="../06-salesforce-etl-batch/module-06.html">Next: Module 6 &mdash; Salesforce ETL &amp; Batch &rarr;</a>
+    </footer>
+
+  </main>
+
+</body>
+</html>

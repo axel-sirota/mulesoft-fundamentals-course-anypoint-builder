@@ -1,0 +1,92 @@
+[
+  {
+    "id": "ACCT-001",
+    "firstName": "Leanne",
+    "lastName": "Graham",
+    "email": "leanne.graham@romaguera.com",
+    "phone": "(512) 555-0101",
+    "company": "Romaguera-Crona",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-002",
+    "firstName": "Ervin",
+    "lastName": "Howell",
+    "email": "ervin.howell@deckow.com",
+    "phone": "(415) 555-0102",
+    "company": "Deckow-Crist",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-003",
+    "firstName": "Clementine",
+    "lastName": "Bauch",
+    "email": "clementine.bauch@keebler.com",
+    "phone": "(617) 555-0103",
+    "company": "Keebler LLC",
+    "industry": "Healthcare"
+  },
+  {
+    "id": "ACCT-004",
+    "firstName": "Patricia",
+    "lastName": "Lebsack",
+    "email": "patricia.lebsack@robel.com",
+    "phone": "(206) 555-0104",
+    "company": "Robel-Corkery",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-005",
+    "firstName": "Chelsey",
+    "lastName": "Dietrich",
+    "email": "chelsey.dietrich@considine.com",
+    "phone": "(312) 555-0105",
+    "company": "Considine-Lockman",
+    "industry": "Financial Services"
+  },
+  {
+    "id": "ACCT-006",
+    "firstName": "Dennis",
+    "lastName": "Schulist",
+    "email": "dennis.schulist@kulas.com",
+    "phone": "(313) 555-0106",
+    "company": "Kulas Light Inc",
+    "industry": "Manufacturing"
+  },
+  {
+    "id": "ACCT-007",
+    "firstName": "Kurtis",
+    "lastName": "Weissnat",
+    "email": "kurtis.weissnat@hoeger.com",
+    "phone": "(303) 555-0107",
+    "company": "Hoeger LLC",
+    "industry": "Technology"
+  },
+  {
+    "id": "ACCT-008",
+    "firstName": "Nicholas",
+    "lastName": "Runolfsdottir",
+    "email": "nicholas.runolfsdottir@stanton.com",
+    "phone": "(615) 555-0108",
+    "company": "Stanton Group",
+    "industry": "Healthcare"
+  },
+  {
+    "id": "ACCT-009",
+    "firstName": "Glenna",
+    "lastName": "Reichert",
+    "email": "glenna.reichert@yost.com",
+    "phone": "(503) 555-0109",
+    "company": "Yost Partners",
+    "industry": "Retail"
+  },
+  {
+    "id": "ACCT-010",
+    "firstName": "Clementina",
+    "lastName": "DuBuque",
+    "email": "clementina.dubuque@mclaughlin.com",
+    "phone": "(704) 555-0110",
+    "company": "McLaughlin & Sons",
+    "industry": "Financial Services"
+  }
+]

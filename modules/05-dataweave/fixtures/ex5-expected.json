@@ -1,0 +1,74 @@
+[
+  {
+    "productId": "PROD-101",
+    "name": "API Gateway License",
+    "price": 1500.00,
+    "categoryName": "API Management"
+  },
+  {
+    "productId": "PROD-102",
+    "name": "API Designer Tool",
+    "price": 600.00,
+    "categoryName": "API Management"
+  },
+  {
+    "productId": "PROD-103",
+    "name": "API Monitoring Suite",
+    "price": 1200.00,
+    "categoryName": "API Management"
+  },
+  {
+    "productId": "PROD-201",
+    "name": "Data Connector",
+    "price": 350.00,
+    "categoryName": "Connectors"
+  },
+  {
+    "productId": "PROD-202",
+    "name": "Financial Connector",
+    "price": 1100.00,
+    "categoryName": "Connectors"
+  },
+  {
+    "productId": "PROD-203",
+    "name": "Healthcare Connector",
+    "price": 750.00,
+    "categoryName": "Connectors"
+  },
+  {
+    "productId": "PROD-301",
+    "name": "HIPAA Compliance Module",
+    "price": 3200.00,
+    "categoryName": "Compliance"
+  },
+  {
+    "productId": "PROD-302",
+    "name": "SOX Audit Framework",
+    "price": 2800.00,
+    "categoryName": "Compliance"
+  },
+  {
+    "productId": "PROD-401",
+    "name": "Data Masking Tool",
+    "price": 500.00,
+    "categoryName": "Data Protection"
+  },
+  {
+    "productId": "PROD-402",
+    "name": "Data Encryption Add-on",
+    "price": 750.00,
+    "categoryName": "Data Protection"
+  },
+  {
+    "productId": "PROD-403",
+    "name": "Audit Trail Logger",
+    "price": 950.00,
+    "categoryName": "Data Protection"
+  },
+  {
+    "productId": "PROD-404",
+    "name": "Access Control Manager",
+    "price": 1800.00,
+    "categoryName": "Data Protection"
+  }
+]

@@ -1,17 +1,31 @@
 """
 REST Enrichment API — Module 4 Infrastructure
 FastAPI service providing company enrichment data for Customer 360.
-Deployed on EC2 via Docker Compose, accessed by students' Mule flows.
+Deployed on ECS Fargate via Terraform, accessed by students' Mule flows.
 """
 
+import os
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security, Request
+from fastapi.security import APIKeyHeader
 
 app = FastAPI(
     title="Customer Enrichment API",
     description="REST enrichment service for MuleSoft Basics course",
     version="1.0.0"
 )
+
+# API Key authentication — when API_KEY env var is set, all routes except /health require it.
+# When API_KEY is empty/unset, auth is skipped (local dev mode).
+EXPECTED_API_KEY = os.environ.get("API_KEY", "")
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+async def verify_api_key(api_key: str = Security(api_key_header)):
+    if not EXPECTED_API_KEY:
+        return  # Local dev mode — no auth
+    if api_key != EXPECTED_API_KEY:
+        raise HTTPException(status_code=403, detail="Invalid or missing API key")
 
 # Enrichment data matching the canonical 10 customers (ACCT-001..010)
 ENRICHMENT_DATA = {
@@ -118,7 +132,7 @@ ENRICHMENT_DATA = {
 }
 
 
-@app.get("/api/enrich/{customer_id}")
+@app.get("/api/enrich/{customer_id}", dependencies=[Security(verify_api_key)])
 def enrich_customer(customer_id: str):
     """Return enrichment data for a customer by ID."""
     data = ENRICHMENT_DATA.get(customer_id)

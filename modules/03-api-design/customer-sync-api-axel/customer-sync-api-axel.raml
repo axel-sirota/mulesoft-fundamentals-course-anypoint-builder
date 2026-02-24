@@ -1,0 +1,83 @@
+#%RAML 1.0
+title: Customer Sync API Axel
+version: v1
+baseUri: https://localhost:8081/api/
+mediaType: application/json
+
+types:
+  Customer:
+    type: object
+    properties:
+      id: string
+      firstname: string
+      lastname: string
+      email: string
+      phone?: string
+      company: string
+      industry: string
+      billinginfo?: string
+
+  ErrorResponse:
+    type: object
+    properties:
+      message: string
+      code: integer
+
+traits:
+    errorResponse:
+      responses:
+        400:
+          body:
+            application/json:
+              type: ErrorResponse
+        500:
+          body:
+            application/json:
+              type: ErrorResponse
+
+    pagination:
+      queryParameters:
+        page:
+          type: integer
+          default: 1
+        pageSize:
+          type: integer
+          default: 20
+        limit:
+          type: integer
+          default: 20
+        offset:
+          type: integer
+
+/customers:
+  get:
+    is: [ errorResponse, pagination ]
+    description: Retrieve a list of customers.
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer[]
+            example: |
+              [
+                {
+                  "id": "123",
+                  "firstname": "John",
+                  "lastname": "Doe",
+                  "email": "john.doe@example.com",
+                  "phone": "123-456-7890",
+                  "company": "Example Corp",
+                  "industry": "Software",
+                  "billinginfo": "123 Main St, Anytown, USA"
+                },
+                {
+                  "id": "124",
+                  "firstname": "Jane",
+                  "lastname": "Smith",
+                  "email": "jane.smith@example.com",
+                  "phone": "987-654-3210",
+                  "company": "Example Corp",
+                  "industry": "Software",
+                  "billinginfo": "456 Elm St, Othertown, USA"
+                }
+              ]

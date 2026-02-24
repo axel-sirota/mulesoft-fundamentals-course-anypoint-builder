@@ -3,6 +3,8 @@ services:
     build: ./rest-api
     ports:
       - "8090:8090"
+    environment:
+      - API_KEY=${API_KEY:-}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/health"]
       interval: 30s
@@ -13,17 +15,18 @@ services:
     build: ./soap-service
     ports:
       - "8091:8091"
+    environment:
+      - API_KEY=${API_KEY:-}
 
   postgres:
-    image: postgres:16-alpine
+    build: ./db
     environment:
       POSTGRES_DB: customer360
       POSTGRES_USER: mulesoft
-      POSTGRES_PASSWORD: mulesoft123
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mulesoft123}
     ports:
       - "5432:5432"
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mulesoft -d customer360"]

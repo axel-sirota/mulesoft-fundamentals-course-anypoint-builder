@@ -1,0 +1,12 @@
+{
+  "main": "customer-sync-api-axel.raml",
+  "name": "Customer Sync API Axel",
+  "classifier": "raml",
+  "organizationId": "f7fbfb56-ffcd-4d6a-b668-91b030e34e1f",
+  "descriptorVersion": "1.0.0",
+  "tags": [],
+  "groupId": "f7fbfb56-ffcd-4d6a-b668-91b030e34e1f",
+  "assetId": "customer-sync-api-axel",
+  "version": "1.0.0",
+  "apiVersion": "1.0.0"
+}

@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars and fill in values before running terraform plan.
+# terraform.tfvars is gitignored — never commit real values.
+
+aws_region          = "us-east-1"
+api_key             = "REPLACE_WITH_YOUR_API_KEY"
+db_password         = "REPLACE_WITH_YOUR_DB_PASSWORD"
+allowed_cidr_blocks = ["0.0.0.0/0"]   # Restrict to classroom IP: ["203.0.113.0/24"]
+project_name        = "mulesoft-course"

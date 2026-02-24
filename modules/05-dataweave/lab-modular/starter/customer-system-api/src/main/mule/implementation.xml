@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Starter: Module 5, Exercise 10 — Refactor Inline DW
+     Based on Module 4 Cycle 9. Your task: extract the Scatter-Gather
+     merge into an external .dwl file with reusable module imports. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <!-- ================================================================ -->
+    <!-- Main implementation flow for GET /customers/{customerId}         -->
+    <!-- Final state: all 9 cycles applied                                -->
+    <!-- ================================================================ -->
+    <flow name="get-customer-implementation">
+        <!-- Cycle 2: Extract customerId from URI parameter -->
+        <set-variable variableName="customerId"
+                      value="#[attributes.uriParams.customerId]"
+                      doc:name="Set customerId"/>
+
+        <!-- Cycle 2: Log the incoming request -->
+        <logger level="INFO"
+                message="#['Processing customer: ' ++ vars.customerId]"
+                doc:name="Log customerId"/>
+
+        <!-- Cycle 9: Wrap business logic in Try scope for error handling -->
+        <try doc:name="Error handling wrapper">
+
+            <!-- Cycle 8: Choice router for conditional source selection -->
+            <choice doc:name="Route by source">
+
+                <!-- REST only -->
+                <when expression="#[attributes.queryParams.source == 'rest']">
+                    <flow-ref name="get-enrichment-data" doc:name="REST only"/>
+                    <ee:transform doc:name="Format REST response">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    company: payload.companyName,
+    industry: payload.industry,
+    employees: payload.employeeCount,
+    revenue: payload.revenue
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                </when>
+
+                <!-- DB only -->
+                <when expression="#[attributes.queryParams.source == 'db']">
+                    <flow-ref name="get-customer-score" doc:name="DB only"/>
+                    <ee:transform doc:name="Format DB response">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    score: payload[0].score,
+    segment: payload[0].segment
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                </when>
+
+                <!-- SOAP only -->
+                <when expression="#[attributes.queryParams.source == 'soap']">
+                    <flow-ref name="validate-address" doc:name="SOAP only"/>
+                    <ee:transform doc:name="Format SOAP response">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    addressValid: payload.body.ValidateAddressResponse.isValid,
+    addressConfidence: payload.body.ValidateAddressResponse.confidence
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                </when>
+
+                <!-- Default: all sources in parallel (Cycle 7) -->
+                <otherwise>
+                    <scatter-gather doc:name="Parallel Enrichment">
+                        <route>
+                            <!-- Route 0: REST enrichment -->
+                            <flow-ref name="get-enrichment-data" doc:name="REST enrichment"/>
+                        </route>
+                        <route>
+                            <!-- Route 1: Database score -->
+                            <flow-ref name="get-customer-score" doc:name="DB score"/>
+                        </route>
+                        <route>
+                            <!-- Route 2: SOAP address validation -->
+                            <flow-ref name="validate-address" doc:name="SOAP address"/>
+                        </route>
+                    </scatter-gather>
+                    <!-- TODO 1: Refactor this inline DataWeave into an external .dwl file
+                         Steps:
+                         a) Copy customer-utils.dwl from your Exercise 6 solution into
+                            src/main/resources/dwl/modules/customer-utils.dwl
+                         b) Create src/main/resources/dwl/enrich-merge.dwl with:
+                            - Import normalizePhone, classifySegment from modules::customer-utils
+                            - output application/json skipNullOn="everywhere"
+                            - Three var declarations to access Scatter-Gather routes:
+                              var enrichment = payload."0".payload
+                              var scoreData  = payload."1".payload[0]
+                              var address    = payload."2".payload
+                            - Merged output object using those functions and null-safe defaults
+                         c) Replace the ee:set-payload CDATA below with:
+                            <ee:set-payload resource="dwl/enrich-merge.dwl" />
+                         Hint: The resource path is relative to src/main/resources/
+                         Expected: Same JSON output as before, but phone is normalized,
+                                   segment comes from classifySegment(), and nulls are handled -->
+                    <ee:transform doc:name="Merge all sources">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var enrichment = payload."0".payload
+var scoreData  = payload."1".payload[0]
+var address    = payload."2".payload
+---
+{
+    customerId:        vars.customerId,
+    company:           enrichment.companyName,
+    industry:          enrichment.industry,
+    employees:         enrichment.employeeCount,
+    revenue:           enrichment.revenue,
+    score:             scoreData.score,
+    segment:           scoreData.segment,
+    addressValid:      address.body.ValidateAddressResponse.isValid,
+    addressConfidence: address.body.ValidateAddressResponse.confidence,
+    enrichedAt:        now()
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                </otherwise>
+            </choice>
+
+            <!-- Cycle 9: Error handlers -->
+            <error-handler>
+                <!-- 404: Customer not found -->
+                <on-error-continue type="HTTP:NOT_FOUND"
+                                   enableNotifications="false"
+                                   logException="false">
+                    <ee:transform doc:name="404 Response">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    error: "Customer not found",
+    customerId: vars.customerId
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                    <set-variable variableName="httpStatus" value="404" doc:name="Set 404"/>
+                </on-error-continue>
+
+                <!-- 503: Service unavailable (any connectivity error) -->
+                <on-error-continue type="HTTP:CONNECTIVITY, DB:CONNECTIVITY, WSC:CONNECTIVITY"
+                                   enableNotifications="false"
+                                   logException="false">
+                    <ee:transform doc:name="503 Response">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    error: "Service unavailable",
+    detail: error.description
+}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                    <set-variable variableName="httpStatus" value="503" doc:name="Set 503"/>
+                </on-error-continue>
+
+                <!-- Catch-all: log and re-throw -->
+                <on-error-propagate type="ANY">
+                    <logger level="ERROR"
+                            message="#['Unhandled error for customer ' ++ vars.customerId ++ ': ' ++ error.description]"
+                            doc:name="Log unhandled error"/>
+                </on-error-propagate>
+            </error-handler>
+        </try>
+    </flow>
+
+    <!-- ================================================================ -->
+    <!-- Sub-flow: REST enrichment (Cycle 3)                              -->
+    <!-- ================================================================ -->
+    <sub-flow name="get-enrichment-data">
+        <http:request config-ref="Enrichment_API" method="GET"
+                      path="/enrich/{customerId}" doc:name="Call Enrichment API">
+            <http:uri-params><![CDATA[#[{customerId: vars.customerId}]]]></http:uri-params>
+        </http:request>
+    </sub-flow>
+
+    <!-- ================================================================ -->
+    <!-- Sub-flow: Database score lookup (Cycle 4)                        -->
+    <!-- ================================================================ -->
+    <sub-flow name="get-customer-score">
+        <db:select config-ref="PostgreSQL_Config" doc:name="Query customer score">
+            <db:sql>SELECT score, segment, last_updated
+                   FROM customer_scores
+                   WHERE customer_id = :customerId</db:sql>
+            <db:input-parameters><![CDATA[#[{customerId: vars.customerId}]]]></db:input-parameters>
+        </db:select>
+    </sub-flow>
+
+    <!-- ================================================================ -->
+    <!-- Sub-flow: SOAP address validation (Cycle 5)                      -->
+    <!-- ================================================================ -->
+    <sub-flow name="validate-address">
+        <wsc:consume config-ref="Address_Validation"
+                     operation="ValidateAddress"
+                     doc:name="Validate Address">
+            <wsc:message>
+                <wsc:body><![CDATA[#[%dw 2.0
+output application/xml
+ns addr http://example.com/address
+---
+addr#ValidateAddress: {
+    addr#street: "123 Innovation Drive",
+    addr#city: "Austin",
+    addr#state: "TX",
+    addr#postalCode: "78701"
+}]]]></wsc:body>
+            </wsc:message>
+        </wsc:consume>
+    </sub-flow>
+
+</mule>

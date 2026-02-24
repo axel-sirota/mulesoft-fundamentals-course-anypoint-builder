@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <category name="Integration">
+    <category name="API Management">
+      <product id="PROD-101" price="1500.00">API Gateway License</product>
+      <product id="PROD-102" price="600.00">API Designer Tool</product>
+      <product id="PROD-103" price="1200.00">API Monitoring Suite</product>
+    </category>
+    <category name="Connectors">
+      <product id="PROD-201" price="350.00">Data Connector</product>
+      <product id="PROD-202" price="1100.00">Financial Connector</product>
+      <product id="PROD-203" price="750.00">Healthcare Connector</product>
+    </category>
+  </category>
+  <category name="Security">
+    <category name="Compliance">
+      <product id="PROD-301" price="3200.00">HIPAA Compliance Module</product>
+      <product id="PROD-302" price="2800.00">SOX Audit Framework</product>
+    </category>
+    <category name="Data Protection">
+      <product id="PROD-401" price="500.00">Data Masking Tool</product>
+      <product id="PROD-402" price="750.00">Data Encryption Add-on</product>
+      <product id="PROD-403" price="950.00">Audit Trail Logger</product>
+      <product id="PROD-404" price="1800.00">Access Control Manager</product>
+    </category>
+  </category>
+</catalog>

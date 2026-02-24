@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4 — Global Configuration (Cycle 6)
+     All connector configs externalized with property placeholders. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <!-- Load properties file (Cycle 6) -->
+    <configuration-properties file="application.properties" doc:name="Configuration properties"/>
+
+    <!-- HTTP Listener — inbound requests (Cycle 1) -->
+    <http:listener-config name="HTTP_Listener_Config" doc:name="HTTP Listener Config">
+        <http:listener-connection host="${http.host}" port="${http.port}"/>
+    </http:listener-config>
+
+    <!-- APIkit Router config — references the RAML spec (Cycle 1) -->
+    <apikit:config name="api-config" api="api/customer-system-api.raml"
+                   outboundHeadersMapName="outboundHeaders"
+                   httpStatusVarName="httpStatus" doc:name="APIkit Config"/>
+
+    <!-- HTTP Request — outbound calls to enrichment REST API (Cycle 3) -->
+    <http:request-config name="Enrichment_API" basePath="${enrichment.api.basePath}"
+                         doc:name="Enrichment API">
+        <http:request-connection host="${enrichment.api.host}"
+                                 port="${enrichment.api.port}"/>
+    </http:request-config>
+
+    <!-- Database — PostgreSQL connection (Cycle 4) -->
+    <db:config name="PostgreSQL_Config" doc:name="PostgreSQL Config">
+        <db:generic-connection
+            url="jdbc:postgresql://${db.host}:${db.port}/${db.name}"
+            user="${db.user}"
+            password="${db.password}"
+            driverClassName="org.postgresql.Driver"/>
+    </db:config>
+
+    <!-- Web Service Consumer — SOAP address validation (Cycle 5) -->
+    <wsc:config name="Address_Validation" doc:name="Address Validation WSC">
+        <wsc:connection wsdlLocation="${soap.address.wsdl}"
+                        service="AddressService"
+                        port="AddressPort"/>
+    </wsc:config>
+
+</mule>

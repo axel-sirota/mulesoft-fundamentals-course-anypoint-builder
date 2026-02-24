@@ -100,6 +100,20 @@ Always inside a collapsible `<details class="instructor-note">`:
 - Include recovery steps if something fails
 - Duration estimate in the summary
 
+### Demo Artifacts (Non-Negotiable)
+
+Every demo documented in the HTML notebook MUST have a corresponding take-home artifact. Demos are the instructor's **safety net** (if the live demo fails), **time fallback** (show the result instead of building from scratch), and **student take-home** (reference material).
+
+| Demo Type | Artifact | Example |
+|-----------|----------|---------|
+| Code script | `demo-{name}.py` at module root | `demo-coupled.py` (Module 1) |
+| RAML design | `demo-{name}.raml` at module root | `demo-customer-api.raml` (Module 3) |
+| Mule project build | `lab/solution/` serves double duty | Module 4 cycles, Module 6 batch ETL |
+| Platform walkthrough | No artifact needed (UI-only) | Module 2 platform tour |
+| DataWeave playground | Fixture files + solution DW | Module 5 exercises |
+
+**Rule:** If the demo and the lab build the same thing, `lab/solution/` is the demo artifact — no separate file needed. If the demo builds something DIFFERENT (like a quick throwaway spec), create a separate `demo-*` file. See `lab-generation.md` for the full demo artifact spec.
+
 ---
 
 ## Lab Instructions

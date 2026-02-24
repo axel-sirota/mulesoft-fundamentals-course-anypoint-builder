@@ -1,0 +1,62 @@
+[
+  {
+    "id": "EMP-001",
+    "name": "Sarah Chen",
+    "title": "CEO",
+    "parentId": null
+  },
+  {
+    "id": "EMP-002",
+    "name": "Marcus Johnson",
+    "title": "VP Engineering",
+    "parentId": "EMP-001"
+  },
+  {
+    "id": "EMP-005",
+    "name": "Priya Patel",
+    "title": "Director of Platform",
+    "parentId": "EMP-002"
+  },
+  {
+    "id": "EMP-008",
+    "name": "Alex Rivera",
+    "title": "Senior Engineer",
+    "parentId": "EMP-005"
+  },
+  {
+    "id": "EMP-009",
+    "name": "Jordan Kim",
+    "title": "Engineer",
+    "parentId": "EMP-005"
+  },
+  {
+    "id": "EMP-006",
+    "name": "David Okafor",
+    "title": "Director of QA",
+    "parentId": "EMP-002"
+  },
+  {
+    "id": "EMP-003",
+    "name": "Lisa Yamamoto",
+    "title": "VP Sales",
+    "parentId": "EMP-001"
+  },
+  {
+    "id": "EMP-007",
+    "name": "Carlos Mendez",
+    "title": "Regional Manager",
+    "parentId": "EMP-003"
+  },
+  {
+    "id": "EMP-004",
+    "name": "James Wright",
+    "title": "VP Operations",
+    "parentId": "EMP-001"
+  },
+  {
+    "id": "EMP-010",
+    "name": "Nina Kowalski",
+    "title": "Operations Manager",
+    "parentId": "EMP-004"
+  }
+]

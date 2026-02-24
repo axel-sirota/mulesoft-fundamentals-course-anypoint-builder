@@ -1,0 +1,27 @@
+[
+  {
+    "customerName": "Romaguera-Crona",
+    "totalAmount": 8350.00,
+    "orderCount": 5
+  },
+  {
+    "customerName": "Deckow-Crist",
+    "totalAmount": 2950.00,
+    "orderCount": 4
+  },
+  {
+    "customerName": "Keebler LLC",
+    "totalAmount": 5250.00,
+    "orderCount": 4
+  },
+  {
+    "customerName": "Considine-Lockman",
+    "totalAmount": 5900.00,
+    "orderCount": 4
+  },
+  {
+    "customerName": "Hoeger LLC",
+    "totalAmount": 4450.00,
+    "orderCount": 3
+  }
+]

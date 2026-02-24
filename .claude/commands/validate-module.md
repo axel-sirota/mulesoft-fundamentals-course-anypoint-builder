@@ -23,6 +23,15 @@ Runs the validation checklist from the module prompt to verify completeness and 
 - Fixtures: verify JSON is valid (`python -m json.tool`), CSV has expected row counts.
 - RAML: verify YAML structure is valid.
 
+**3.5. Demo Artifact Validation**
+- Count instructor demo sections in the HTML (`<details class="instructor-note">` blocks containing "Demo" in their summary).
+- For each demo section, verify a corresponding artifact exists:
+  - Separate `demo-*` file at module root, OR
+  - `lab/solution/` if the demo and lab build the same thing (document which).
+- Platform UI walkthroughs (Module 2) are the one exception — no artifact needed.
+- Verify demo artifacts are valid: Python compiles, RAML/YAML parses, JSON validates.
+- Report: demo section count vs artifact count, any mismatches.
+
 **4. Data Consistency**
 - Customer IDs consistent (ACCT-001 through ACCT-010).
 - Cross-reference fixture inputs with expected outputs.

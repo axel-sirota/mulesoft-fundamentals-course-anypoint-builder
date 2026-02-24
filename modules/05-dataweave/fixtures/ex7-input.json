@@ -1,0 +1,64 @@
+{
+  "org": [
+    {
+      "id": "EMP-001",
+      "name": "Sarah Chen",
+      "title": "CEO",
+      "reports": [
+        {
+          "id": "EMP-002",
+          "name": "Marcus Johnson",
+          "title": "VP Engineering",
+          "reports": [
+            {
+              "id": "EMP-005",
+              "name": "Priya Patel",
+              "title": "Director of Platform",
+              "reports": [
+                {
+                  "id": "EMP-008",
+                  "name": "Alex Rivera",
+                  "title": "Senior Engineer"
+                },
+                {
+                  "id": "EMP-009",
+                  "name": "Jordan Kim",
+                  "title": "Engineer"
+                }
+              ]
+            },
+            {
+              "id": "EMP-006",
+              "name": "David Okafor",
+              "title": "Director of QA"
+            }
+          ]
+        },
+        {
+          "id": "EMP-003",
+          "name": "Lisa Yamamoto",
+          "title": "VP Sales",
+          "reports": [
+            {
+              "id": "EMP-007",
+              "name": "Carlos Mendez",
+              "title": "Regional Manager"
+            }
+          ]
+        },
+        {
+          "id": "EMP-004",
+          "name": "James Wright",
+          "title": "VP Operations",
+          "reports": [
+            {
+              "id": "EMP-010",
+              "name": "Nina Kowalski",
+              "title": "Operations Manager"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

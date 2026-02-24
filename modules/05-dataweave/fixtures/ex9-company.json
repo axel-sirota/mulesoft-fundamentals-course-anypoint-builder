@@ -1,0 +1,10 @@
+{
+  "customerId": "ACCT-001",
+  "companyName": "Romaguera-Crona",
+  "industry": "Technology",
+  "employeeCount": 2500,
+  "revenue": 450000000,
+  "headquarters": "Austin, TX",
+  "founded": 2008,
+  "website": "https://romaguera-crona.example.com"
+}

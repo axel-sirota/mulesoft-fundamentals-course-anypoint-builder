@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 2 — First DataWeave Transform
+     Extract customerId, log it, return placeholder enriched response. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <flow name="get-customer-implementation">
+        <!-- Extract customerId from URI parameter -->
+        <set-variable variableName="customerId"
+                      value="#[attributes.uriParams.customerId]"
+                      doc:name="Set customerId"/>
+
+        <!-- Log the incoming request -->
+        <logger level="INFO"
+                message="#['Processing customer: ' ++ vars.customerId]"
+                doc:name="Log customerId"/>
+
+        <!-- Placeholder response — real enrichment coming in next cycles -->
+        <ee:transform doc:name="Placeholder response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    customerId: vars.customerId,
+    message: "Enrichment coming in next cycles"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

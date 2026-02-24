@@ -1,0 +1,48 @@
+[
+  {
+    "description": "Source fields win on conflict",
+    "source": {
+      "id": "ACCT-001",
+      "firstName": "Leanne",
+      "lastName": "Graham",
+      "email": "leanne.graham@romaguera.com",
+      "company": "Romaguera-Crona"
+    },
+    "enrichment": {
+      "companyName": "Romaguera-Crona Inc.",
+      "industry": "Technology",
+      "employeeCount": 2500,
+      "revenue": 450000000
+    },
+    "expected": {
+      "id": "ACCT-001",
+      "firstName": "Leanne",
+      "lastName": "Graham",
+      "email": "leanne.graham@romaguera.com",
+      "company": "Romaguera-Crona",
+      "companyName": "Romaguera-Crona Inc.",
+      "industry": "Technology",
+      "employeeCount": 2500,
+      "revenue": 450000000
+    }
+  },
+  {
+    "description": "Source overrides enrichment on shared key",
+    "source": {
+      "id": "ACCT-005",
+      "company": "Considine-Lockman",
+      "industry": "Financial Services"
+    },
+    "enrichment": {
+      "company": "Considine-Lockman Holdings",
+      "industry": "Finance",
+      "employeeCount": 3100
+    },
+    "expected": {
+      "id": "ACCT-005",
+      "company": "Considine-Lockman",
+      "industry": "Financial Services",
+      "employeeCount": 3100
+    }
+  }
+]

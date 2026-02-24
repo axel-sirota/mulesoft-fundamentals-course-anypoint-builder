@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 4: Building the Customer Enrichment Engine — MuleSoft Basics (Student)</title>
+
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#00A1E0',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#0078D4',
+        lineColor: '#8B949E',
+        secondaryColor: '#1A1F36',
+        tertiaryColor: '#2D333B'
+      }
+    });
+  </script>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-bg: #1A1F36;
+      --accent-primary: #00A1E0;
+      --accent-secondary: #0078D4;
+      --bg-main: #F8F9FA;
+      --bg-section: #FFFFFF;
+      --bg-lab: #F0F7FF;
+      --bg-lab-advanced: #F5F0FF;
+      --text-primary: #1A1F36;
+      --text-secondary: #6B7280;
+      --border-light: #E5E7EB;
+      --callout-info: #DBEAFE;
+      --callout-success: #D1FAE5;
+      --callout-warning: #FEF3C7;
+      --callout-danger: #FEE2E2;
+      --callout-instructor: #EDE9FE;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #fff;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--accent-primary); }
+    .sidebar a { display: block; color: #C9CDD5; text-decoration: none; padding: 0.5rem 0; font-size: 0.9rem; transition: color 0.2s; }
+    .sidebar a:hover, .sidebar a.active { color: var(--accent-primary); }
+    .sidebar .section-group { margin-bottom: 1rem; }
+    .sidebar .section-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8B949E; margin-bottom: 0.25rem; }
+
+    /* Main Content */
+    .content {
+      margin-left: 280px;
+      max-width: 900px;
+      padding: 2rem 3rem 4rem;
+      width: calc(100% - 280px);
+    }
+
+    /* Header */
+    .module-header { margin-bottom: 3rem; }
+    .badges { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-duration { background: var(--accent-primary); color: #fff; }
+    .badge-day { background: var(--sidebar-bg); color: #fff; }
+    .module-header h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+    .subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+    .objectives {
+      background: var(--callout-info);
+      border-left: 4px solid var(--accent-primary);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .objectives h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent-secondary); }
+    .objectives ul { padding-left: 1.25rem; }
+    .objectives li { margin-bottom: 0.25rem; font-size: 0.95rem; }
+
+    /* Sections */
+    section { margin-bottom: 3rem; }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent-primary);
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    section h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+    p { margin-bottom: 1rem; }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+    }
+    .callout-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .callout-info { background: var(--callout-info); border-color: var(--accent-primary); }
+    .callout-success { background: var(--callout-success); border-color: #059669; }
+    .callout-warning { background: var(--callout-warning); border-color: #D97706; }
+    .callout-danger { background: var(--callout-danger); border-color: #DC2626; }
+
+    /* Code blocks */
+    pre[class*="language-"] {
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin: 1rem 0;
+    }
+    code { font-family: 'JetBrains Mono', monospace; }
+    :not(pre) > code {
+      background: #F3F4F6;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #DC2626;
+    }
+
+    /* Diagram container */
+    .diagram-container { margin: 1.5rem 0; text-align: center; }
+    .diagram-caption { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic; }
+    .mermaid { background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; }
+
+    /* Code compare side-by-side */
+    .code-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .code-panel h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+
+    /* Comparison table */
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-light); }
+    th { background: var(--sidebar-bg); color: #fff; font-weight: 600; }
+    tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Lab section */
+    .lab-section {
+      background: var(--bg-lab);
+      border: 2px solid #93C5FD;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .lab-section h2 { border-bottom-color: var(--accent-secondary); }
+    .lab-step { display: flex; gap: 1rem; margin: 1.5rem 0; align-items: flex-start; }
+    .step-number {
+      background: var(--accent-primary);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-bottom: 0.25rem; }
+    .validation {
+      background: var(--callout-success);
+      border-left: 4px solid #059669;
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    /* Closing banner */
+    .closing-banner {
+      background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--accent-secondary) 100%);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .closing-banner h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .closing-banner p { opacity: 0.9; }
+
+    /* Footer */
+    .module-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 2rem 0;
+      border-top: 2px solid var(--border-light);
+      margin-top: 3rem;
+    }
+    .module-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .module-footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 1.5rem; width: 100%; }
+      .code-compare { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar">
+    <h2>MuleSoft Basics</h2>
+    <div class="section-group">
+      <div class="section-group-title">Module 4</div>
+      <a href="#cycle-1" class="active">Cycle 1: Scaffold &amp; APIkit</a>
+      <a href="#cycle-2">Cycle 2: DataWeave &amp; Variables</a>
+      <a href="#cycle-3">Cycle 3: REST Connector</a>
+      <a href="#cycle-4">Cycle 4: Database Connector</a>
+      <a href="#cycle-5">Cycle 5: SOAP Connector</a>
+      <a href="#cycle-6">Cycle 6: Refactoring</a>
+      <a href="#cycle-7">Cycle 7: Scatter-Gather</a>
+      <a href="#cycle-8">Cycle 8: Choice Router</a>
+      <a href="#cycle-9">Cycle 9: Error Handling</a>
+    </div>
+    <div class="section-group">
+      <div class="section-group-title">Course</div>
+      <a href="../01-intro-to-mulesoft/module-01.html">Module 1: Why MuleSoft?</a>
+      <a href="../02-anypoint-platform-tour/module-02.html">Module 2: Platform Tour</a>
+      <a href="../03-api-design/module-03.html">Module 3: API Design</a>
+      <a href="../05-dataweave/module-05.html">Module 5: DataWeave</a>
+      <a href="../06-salesforce-etl-batch/module-06.html">Module 6: SF ETL</a>
+      <a href="../07-deploy-manage-llm/module-07.html">Module 7: Deploy &amp; AI</a>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- Header -->
+    <header class="module-header">
+      <div class="badges">
+        <span class="badge badge-duration">~6.5 hours</span>
+        <span class="badge badge-day">Day 2</span>
+      </div>
+      <h1>Building the Customer Enrichment Engine</h1>
+      <p class="subtitle">From API spec to production-ready integration &mdash; 9 incremental build cycles</p>
+      <div class="objectives">
+        <h3>Learning Objectives</h3>
+        <ul>
+          <li>Scaffold a Mule project from a RAML specification using APIkit</li>
+          <li>Use DataWeave expressions in flows for variables, transforms, and logging</li>
+          <li>Connect to external REST APIs, PostgreSQL databases, and SOAP web services</li>
+          <li>Execute calls in parallel with Scatter-Gather and merge results with DataWeave</li>
+          <li>Route requests conditionally with the Choice router</li>
+          <li>Handle errors gracefully with Try scopes, on-error-continue, and on-error-propagate</li>
+          <li>Externalize configuration with property files and global elements</li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Bridge from Module 3 -->
+    <section id="bridge">
+      <h2>From API Contract to Running Code</h2>
+
+      <p>Yesterday you designed a RAML specification for the Customer System API and published it to Anypoint Exchange. That spec defines <em>what</em> your API does &mdash; the resources, methods, data types, and examples. Today you'll build <em>how</em> it does it.</p>
+
+      <p>Over the next 9 cycles, you'll transform that RAML contract into a production-ready Mule application. Each cycle introduces <strong>one new Mule component</strong> (sometimes called a "card" in the visual canvas). By the end of the day, a single <code>GET /api/customers/ACCT-001</code> request will fan out to three backend systems in parallel, merge the results, and return a unified JSON response &mdash; with error handling for when things go wrong.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Day1["Day 1 — Module 3"]
+        RAML["RAML Spec\n5 endpoints defined"]
+        PUB["Published to Exchange"]
+        RAML --> PUB
+    end
+    subgraph Day2["Day 2 — Module 4 (Today)"]
+        IMP["Import spec into ACB"]
+        C1["Cycle 1: Scaffold + APIkit"]
+        C2["Cycle 2: DataWeave"]
+        C3["Cycle 3: REST Connector"]
+        C4["Cycle 4: DB Connector"]
+        C5["Cycle 5: SOAP Connector"]
+        C6["Cycle 6: Properties"]
+        C7["Cycle 7: Scatter-Gather"]
+        C8["Cycle 8: Choice Router"]
+        C9["Cycle 9: Error Handling"]
+        IMP --> C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+    end
+    PUB -->|"API-First"| IMP
+
+    classDef day1Style fill:#7C3AED,stroke:#6D28D9,color:#fff
+    classDef day2Style fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef bridgeStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class RAML,PUB day1Style
+    class C1,C2,C3,C4,C5,C6,C7,C8,C9 day2Style
+    class IMP bridgeStyle
+        </pre>
+        <p class="diagram-caption">Figure 0: Your journey &mdash; Module 3's RAML spec becomes a running application through 9 incremental build cycles</p>
+      </div>
+
+      <h3>How Each Cycle Works</h3>
+      <p>Every cycle follows the same pattern: <strong>Theory</strong> (understand the concept and the new Mule component), <strong>Demo</strong> (watch the instructor build it live), <strong>Lab</strong> (build it yourself). Each cycle builds directly on the previous one &mdash; you never start from scratch. By Cycle 9, your project contains every component from all previous cycles working together.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Mule Components ("Cards")</div>
+        <p>In the Mule canvas view, each processor appears as a <strong>card</strong> in the visual flow. In XML, each card is an XML element. Here are the cards you'll learn today, in order:</p>
+        <table>
+          <thead><tr><th>Cycle</th><th>Card / Component</th><th>What It Does</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><code>&lt;apikit:router&gt;</code></td><td>Routes requests to flows based on your RAML spec</td></tr>
+            <tr><td>2</td><td><code>&lt;set-variable&gt;</code>, <code>&lt;ee:transform&gt;</code>, <code>&lt;logger&gt;</code></td><td>Store values, transform data, trace execution</td></tr>
+            <tr><td>3</td><td><code>&lt;http:request&gt;</code></td><td>Call an external REST API</td></tr>
+            <tr><td>4</td><td><code>&lt;db:select&gt;</code></td><td>Query a database</td></tr>
+            <tr><td>5</td><td><code>&lt;wsc:consume&gt;</code></td><td>Call a SOAP web service</td></tr>
+            <tr><td>6</td><td><code>&lt;configuration-properties&gt;</code></td><td>Load config from a properties file</td></tr>
+            <tr><td>7</td><td><code>&lt;scatter-gather&gt;</code></td><td>Execute routes in parallel</td></tr>
+            <tr><td>8</td><td><code>&lt;choice&gt;</code></td><td>Route conditionally based on expressions</td></tr>
+            <tr><td>9</td><td><code>&lt;try&gt;</code>, <code>&lt;on-error-continue&gt;</code></td><td>Handle errors gracefully</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ACB Orientation -->
+    <section id="acb-orientation">
+      <h2>Anypoint Code Builder &mdash; Quick Reference</h2>
+
+      <p>Every cycle in this module happens inside <strong>Anypoint Code Builder (ACB)</strong>, which is a VS Code extension. Before you start building, familiarize yourself with the key areas of the IDE and the actions you'll use repeatedly.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph VSCode["VS Code Window"]
+        subgraph ActivityBar["Activity Bar"]
+            ACB_ICON["MuleSoft Logo Icon"]
+            EXPLORER["Explorer Icon"]
+        end
+        subgraph SidebarPanel["ACB Sidebar Panel"]
+            QA["Quick Actions\n- Design an API\n- Implement an API\n- Create Integration"]
+            PROJ["Project Panel\n- Flow files\n- Dependencies"]
+        end
+        subgraph EditorArea["Editor Area"]
+            XML_VIEW["XML Source View"]
+            CANVAS_VIEW["Canvas View"]
+            TOGGLE["Toggle: XML or Canvas\n(top-right icons)"]
+        end
+        subgraph TerminalArea["Integrated Terminal"]
+            LOGS["Mule Runtime Logs + curl"]
+        end
+    end
+        </pre>
+        <p class="diagram-caption">Figure 1: Anypoint Code Builder layout inside VS Code &mdash; Activity Bar, Sidebar, Editor, and Terminal</p>
+      </div>
+
+      <h3>Key Actions You'll Use</h3>
+      <table>
+        <thead>
+          <tr><th>Action</th><th>How</th><th>When</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Import API from Exchange</td>
+            <td>MuleSoft logo &rarr; Quick Actions &rarr; <strong>"Implement an API"</strong></td>
+            <td>Cycle 1</td>
+          </tr>
+          <tr>
+            <td>Toggle XML / Canvas</td>
+            <td>Top-right icons in editor: <code>&lt;/&gt;</code> for XML, grid icon for Canvas</td>
+            <td>Every cycle</td>
+          </tr>
+          <tr>
+            <td>Add a connector</td>
+            <td>In XML: type <code>&lt;http:request</code> + <strong>Ctrl+Space</strong> for autocomplete</td>
+            <td>Cycles 3&ndash;5</td>
+          </tr>
+          <tr>
+            <td>Add Maven dependency</td>
+            <td>Open <code>pom.xml</code> &rarr; add <code>&lt;dependency&gt;</code> &rarr; Save</td>
+            <td>Cycles 4&ndash;5</td>
+          </tr>
+          <tr>
+            <td>Run Mule App</td>
+            <td>Right-click project root &rarr; <strong>"Run Mule Application"</strong></td>
+            <td>Every cycle</td>
+          </tr>
+          <tr>
+            <td>Test with curl</td>
+            <td>New terminal tab &rarr; <code>curl -s http://localhost:8081/api/...</code></td>
+            <td>Every cycle</td>
+          </tr>
+          <tr>
+            <td>Command Palette</td>
+            <td><strong>Cmd+Shift+P</strong> (macOS) / <strong>Ctrl+Shift+P</strong> (Windows)</td>
+            <td>As needed</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Project File Structure</h3>
+
+      <p>After scaffolding in Cycle 1, your project will have this structure. Each file has a specific role &mdash; knowing where to find things saves time on every cycle.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Project["customer-system-api/"]
+        POM["pom.xml\nDependencies"]
+        MAJ["mule-artifact.json"]
+        subgraph SrcMain["src/main/"]
+            subgraph MuleDir["mule/"]
+                MAIN["main.xml\nAPIkit Router"]
+                IMPL["implementation.xml\nBusiness Logic"]
+                GLOB["global-config.xml\nAll Configs"]
+            end
+            subgraph Resources["resources/"]
+                PROPS["application.properties"]
+                subgraph APIDir["api/"]
+                    RAML["customer-system-api.raml"]
+                end
+            end
+        end
+    end
+
+    style MAIN fill:#00A1E0,color:#fff
+    style IMPL fill:#059669,color:#fff
+    style GLOB fill:#D97706,color:#fff
+    style PROPS fill:#7C3AED,color:#fff
+        </pre>
+        <p class="diagram-caption">Figure 2: Project structure &mdash; main.xml (blue) has the router, implementation.xml (green) is where you build, global-config.xml (orange) holds configs, application.properties (purple) stores environment values</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 1: Scaffold from RAML & APIkit Router                  -->
+    <!-- ============================================================ -->
+    <section id="cycle-1">
+      <h2>Cycle 1: Scaffold from RAML &amp; APIkit Router (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: Starting Point</div>
+        <p>You have a <strong>RAML spec</strong> published to Exchange from Module 3. No Mule project yet.</p>
+      </div>
+
+      <h3>Concept: API-First Implementation</h3>
+
+      <p>In Module 3, you designed a RAML specification and published it to Exchange. Now you'll close the loop: import that spec into a Mule project and watch APIkit generate a fully functional router with stub flows for every endpoint. This is the API-first workflow in action &mdash; the contract you wrote becomes running code.</p>
+
+      <h3>New Component: <code>&lt;apikit:router&gt;</code></h3>
+
+      <p>The <strong>APIkit Router</strong> is the first Mule component you'll encounter. Think of it as a traffic controller that sits at the front of your application. When an HTTP request arrives, the router reads your RAML specification and automatically decides which flow should handle it. You don't write any routing logic &mdash; the RAML spec <em>is</em> the routing table.</p>
+
+      <p>In the canvas view, the APIkit Router appears as a single card. Behind the scenes, it validates the incoming request against your RAML (checking the path, method, query parameters, and request body), then dispatches to the matching flow. If the request doesn't match any endpoint in your spec, the router raises an error (like 404 or 405) that the error handler catches.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    A["RAML Spec\n(Module 3)"] --> B["Publish to\nExchange"]
+    B --> C["Import into\nACB Project"]
+    C --> D["APIkit Router\nGenerates Flows"]
+    D --> E["Stub Flows\nwith Mock Data"]
+    E --> F["Run and Test\nlocalhost:8081"]
+
+    classDef specStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef processStyle fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef routerStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef runStyle fill:#059669,stroke:#047857,color:#fff
+
+    class A specStyle
+    class B,C processStyle
+    class D routerStyle
+    class E,F runStyle
+        </pre>
+        <p class="diagram-caption">Figure 3: API-First workflow &mdash; from RAML spec to running stubs in minutes</p>
+      </div>
+
+      <p>APIkit reads your RAML and generates:</p>
+      <ul>
+        <li>A <strong>main flow</strong> with an HTTP Listener and an APIkit Router</li>
+        <li>One <strong>stub flow per endpoint</strong> (e.g., <code>get:\customers:api-config</code> for GET /customers)</li>
+        <li>An <strong>error handler</strong> that maps APIKIT errors to HTTP status codes (400, 404, 405, etc.)</li>
+      </ul>
+
+      <p>The stub flows return your RAML example data as mock responses. Your API works immediately &mdash; you just need to replace the stubs with real logic over the next 8 cycles.</p>
+
+      <h3>Code: What APIkit Generates</h3>
+
+      <h4>The Main Flow (main.xml)</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;flow name="customer-system-api-main"&gt;
+    &lt;http:listener config-ref="HTTP_Listener_Config" path="/api/*"&gt;
+        &lt;http:response statusCode="#[vars.httpStatus default 200]"/&gt;
+    &lt;/http:listener&gt;
+    &lt;apikit:router config-ref="api-config"/&gt;
+    &lt;error-handler&gt;
+        &lt;on-error-propagate type="APIKIT:BAD_REQUEST"&gt;
+            &lt;set-variable variableName="httpStatus" value="400"/&gt;
+            &lt;set-payload value="#[output application/json --- {message: 'Bad request'}]"/&gt;
+        &lt;/on-error-propagate&gt;
+        &lt;on-error-propagate type="APIKIT:NOT_FOUND"&gt;
+            &lt;set-variable variableName="httpStatus" value="404"/&gt;
+            &lt;set-payload value="#[output application/json --- {message: 'Resource not found'}]"/&gt;
+        &lt;/on-error-propagate&gt;
+        &lt;on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED"&gt;
+            &lt;set-variable variableName="httpStatus" value="405"/&gt;
+            &lt;set-payload value="#[output application/json --- {message: 'Method not allowed'}]"/&gt;
+        &lt;/on-error-propagate&gt;
+    &lt;/error-handler&gt;
+&lt;/flow&gt;</code></pre>
+
+      <h4>A Generated Stub Flow</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- APIkit generates one flow per method+resource combination --&gt;
+&lt;flow name="get:\customers:api-config"&gt;
+    &lt;!-- Returns the RAML example data as a mock response --&gt;
+    &lt;set-payload value='#[output application/json ---
+[
+  {id: "ACCT-001", firstName: "Leanne", lastName: "Graham",
+   email: "leanne.graham@romaguera.com", company: "Romaguera-Crona",
+   industry: "Technology"},
+  {id: "ACCT-002", firstName: "Ervin", lastName: "Howell",
+   email: "ervin.howell@deckow.com", company: "Deckow-Crist",
+   industry: "Technology"}
+]]'/&gt;
+&lt;/flow&gt;</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">How APIkit Names Flows</div>
+        <p>The naming convention is <code>method:\resource\subresource:config-name</code>. For example: <code>get:\customers\(customerId):api-config</code> maps to <code>GET /customers/{customerId}</code>. The backslash separates path segments, and URI parameters appear in parentheses with lowercase names.</p>
+      </div>
+
+      <!-- Lab 1 -->
+      <section class="lab-section">
+        <h2>Lab: Scaffold Your Project from RAML</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Import Your Module 3 API Spec from Exchange</h4>
+            <p>Click the MuleSoft logo &rarr; Quick Actions &rarr; <strong>"Implement an API"</strong>. Search for your Customer System API, select version v1, and import it. Wait for Maven to finish resolving dependencies.</p>
+            <div class="validation">Validation: Project opens in ACB with no red error markers. <code>src/main/mule/</code> contains XML flow files.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Run the Project Locally</h4>
+            <p>Right-click the project root folder &rarr; <strong>"Run Mule Application"</strong>. Watch the terminal for the startup sequence.</p>
+            <div class="validation">Validation: Terminal shows <code>DEPLOYED</code> or <code>Started app 'customer-system-api'</code>.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Test the Stub Endpoints</h4>
+            <p>Open a new terminal tab and run these curl commands:</p>
+            <pre class="language-bash"><code class="language-bash"># List customers (returns RAML example data)
+curl -s http://localhost:8081/api/customers | python3 -m json.tool
+
+# Get single customer
+curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool
+
+# Test invalid path (should return error)
+curl -s http://localhost:8081/api/invalid | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: GET /api/customers returns your RAML example data. GET /api/invalid returns a 405 error response.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-01/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">ACB Canvas: How to Add Any Component</div>
+          <p>From Cycle 2 onward, you'll add components to your flows using the ACB canvas. Here's the universal pattern:</p>
+          <ol>
+            <li><strong>Open canvas mode</strong> &mdash; click the <em>Show Mule graphical mode</em> icon (top-right of the XML editor).</li>
+            <li><strong>Click the <code>+</code> icon</strong> at the point in the flow where you want to add the component.</li>
+            <li><strong>Search</strong> for the component name in the <em>Add Component</em> panel (e.g., "Set Variable", "HTTP Request", "Transform Message").</li>
+            <li><strong>Select</strong> the component &mdash; it appears on the canvas.</li>
+            <li><strong>Configure</strong> in the properties panel on the right (name, expression, connection, etc.).</li>
+          </ol>
+          <p>If a connector isn't available locally, toggle <strong>"Search in Exchange"</strong> in the Add Component panel to download it automatically. ACB adds the Maven dependency to your <code>pom.xml</code> for you.</p>
+          <p>You can always switch between canvas and XML views. The canvas writes the XML for you; the XML view shows exactly what was generated.</p>
+        </div>
+
+        <div class="diagram-container">
+          <pre class="mermaid">
+graph TD
+    A["Open XML file"] --> B["Click canvas icon\n(top-right)"]
+    B --> C["Click + icon\nin the flow"]
+    C --> D["Search component\n(e.g. 'Set Variable')"]
+    D --> E["Select it"]
+    E --> F["Configure in\nproperties panel"]
+    F --> G["Switch to XML view\nto verify"]
+
+    classDef stepStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    class A,B,C,D,E,F,G stepStyle
+          </pre>
+          <p class="diagram-caption">Figure: Adding components in ACB &mdash; this is the pattern you'll follow for every cycle from here on.</p>
+        </div>
+
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 2: DataWeave in Flows                                  -->
+    <!-- ============================================================ -->
+    <section id="cycle-2">
+      <h2>Cycle 2: DataWeave in Flows &mdash; Variables, Attributes, Transforms (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 1</div>
+        <p>You have a <strong>scaffolded project</strong> with APIkit Router and stub flows returning mock data. <code>GET /api/customers</code> works but returns hardcoded RAML examples.</p>
+      </div>
+
+      <h3>New Components: <code>&lt;set-variable&gt;</code>, <code>&lt;ee:transform&gt;</code>, <code>&lt;logger&gt;</code></h3>
+
+      <p>Before you can connect to external systems, you need to understand how data flows through your Mule application and learn the three most fundamental Mule components:</p>
+
+      <ul>
+        <li><strong><code>&lt;set-variable&gt;</code></strong> &mdash; Stores a value for later use. Unlike the payload (which gets overwritten by every processor), variables persist throughout the entire flow execution. You'll use this to save the customer ID from the URL so it's available after other processors replace the payload.</li>
+        <li><strong><code>&lt;ee:transform&gt;</code></strong> (Transform Message) &mdash; The workhorse of Mule. It takes any input format, applies a DataWeave expression, and produces a new payload. This is how you build JSON responses, map fields between formats, and shape data.</li>
+        <li><strong><code>&lt;logger&gt;</code></strong> &mdash; Writes a message to the Mule runtime console. Essential for debugging &mdash; you can include DataWeave expressions in the log message to see variable values at runtime.</li>
+      </ul>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Flow["get:\customers\(customerId):api-config"]
+        SV["Set Variable\n(save customerId)"]
+        LOG["Logger\n(trace execution)"]
+        TM["Transform Message\n(build JSON response)"]
+        SV --> LOG --> TM
+    end
+    subgraph ACB["Finding in ACB"]
+        direction TB
+        X1["XML: type set-variable\n+ Ctrl+Space"]
+        X2["XML: type logger\n+ Ctrl+Space"]
+        X3["XML: type ee:transform\n+ Ctrl+Space"]
+    end
+
+    classDef svStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef logStyle fill:#6B7280,stroke:#4B5563,color:#fff
+    classDef tmStyle fill:#059669,stroke:#047857,color:#fff
+
+    class SV svStyle
+    class LOG logStyle
+    class TM tmStyle
+        </pre>
+        <p class="diagram-caption">Figure 4a: Cycle 2 flow &mdash; three new cards (Set Variable, Logger, Transform Message) replace the stub. In ACB, type the element name + Ctrl+Space for autocomplete.</p>
+      </div>
+
+      <h3>Concept: The Mule Event</h3>
+
+      <p>To use these components effectively, you need to understand the Mule Event. Every message flowing through a Mule application is a <strong>Mule Event</strong>. It has three parts: the <strong>payload</strong> (the main data), <strong>attributes</strong> (metadata like HTTP headers, query parameters, and URI parameters), and <strong>variables</strong> (custom values you set during flow execution). Understanding this structure is the key to writing DataWeave expressions in your flows.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph MuleEvent["Mule Event"]
+        subgraph Attributes["attributes"]
+            HP["headers\n(Accept, Content-Type)"]
+            QP["queryParams\n(industry, limit)"]
+            UP["uriParams\n(customerId)"]
+            RM["method, requestPath"]
+        end
+        subgraph Payload["payload"]
+            PL["Request Body or\nPrevious Step's Output"]
+        end
+        subgraph Variables["vars"]
+            V1["customerId"]
+            V2["source"]
+            V3["httpStatus"]
+        end
+    end
+
+    classDef attrStyle fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef payStyle fill:#059669,stroke:#047857,color:#fff
+    classDef varStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class HP,QP,UP,RM attrStyle
+    class PL payStyle
+    class V1,V2,V3 varStyle
+        </pre>
+        <p class="diagram-caption">Figure 4: The Mule Event &mdash; attributes (blue) carry request metadata, payload (green) carries data, vars (orange) store your custom values</p>
+      </div>
+
+      <p>DataWeave is the expression language you use to access and transform all three parts. When an HTTP request arrives at <code>GET /api/customers/ACCT-001?source=rest</code>, the event looks like this:</p>
+
+      <table>
+        <thead>
+          <tr><th>Expression</th><th>Value</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>attributes.uriParams.customerId</code></td><td><code>"ACCT-001"</code></td><td>Path parameter</td></tr>
+          <tr><td><code>attributes.queryParams.source</code></td><td><code>"rest"</code></td><td>Query string</td></tr>
+          <tr><td><code>attributes.method</code></td><td><code>"GET"</code></td><td>HTTP method</td></tr>
+          <tr><td><code>payload</code></td><td><code>null</code></td><td>No request body for GET</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Code: Working with Events in Flows</h3>
+
+      <h4>Set Variable &mdash; Capture the Customer ID</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- Extract the customerId from the URI and store it as a variable --&gt;
+&lt;set-variable variableName="customerId"
+              value="#[attributes.uriParams.customerId]"
+              doc:name="Set customerId"/&gt;</code></pre>
+
+      <h4>Transform Message &mdash; Build a JSON Response</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;ee:transform doc:name="Build Response"&gt;
+  &lt;ee:message&gt;
+    &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  message: "Enrichment placeholder for " ++ vars.customerId
+}]]&gt;&lt;/ee:set-payload&gt;
+  &lt;/ee:message&gt;
+&lt;/ee:transform&gt;</code></pre>
+
+      <h4>Logger &mdash; Trace Execution</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;logger level="INFO"
+        message="#['Processing customer: ' ++ vars.customerId]"
+        doc:name="Log customerId"/&gt;</code></pre>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">DataWeave vs. MEL</div>
+        <p>Mule 3 used MEL (Mule Expression Language). Mule 4 uses DataWeave everywhere. If you see <code>#[mel:...]</code> in old docs, ignore it. All expressions in Mule 4 use <code>#[DataWeave expression]</code> syntax.</p>
+      </div>
+
+      <!-- Lab 2 -->
+      <section class="lab-section">
+        <h2>Lab: Add DataWeave to Your Flow</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Set Variable for customerId</h4>
+            <p>Open the <code>get:\customers\(customerId):api-config</code> flow in canvas mode. Delete the existing stub Set Payload (click it &rarr; trash icon). Then click <code>+</code> &rarr; search <strong>"Set Variable"</strong> &rarr; select it. In the properties panel, set:</p>
+            <ul>
+              <li><strong>Display Name</strong>: <code>Set customerId</code></li>
+              <li><strong>Name</strong>: <code>customerId</code></li>
+              <li><strong>Value</strong>: <code>#[attributes.uriParams.customerId]</code></li>
+            </ul>
+            <div class="validation">Validation: No red error markers. Switch to XML view &mdash; you should see a <code>&lt;set-variable&gt;</code> element.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Add a Logger</h4>
+            <p>Click <code>+</code> after Set Variable &rarr; search <strong>"Logger"</strong> &rarr; select it. Configure:</p>
+            <ul>
+              <li><strong>Message</strong>: <code>#['Processing customer: ' ++ vars.customerId]</code></li>
+              <li><strong>Level</strong>: <code>INFO</code></li>
+            </ul>
+            <div class="validation">Validation: Mule runtime console shows <code>Processing customer: ACCT-001</code> when you hit the endpoint.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Add Transform Message</h4>
+            <p>Click <code>+</code> after Logger &rarr; search <strong>"Transform Message"</strong> &rarr; select it. Click the Transform component, then click <strong>Edit</strong> to open the DataWeave editor. Write:</p>
+            <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  message: "Enrichment placeholder for " ++ vars.customerId
+}</code></pre>
+            <div class="validation">Validation: <code>GET /api/customers/ACCT-001</code> returns <code>{"customerId": "ACCT-001", "message": "Enrichment placeholder for ACCT-001"}</code></div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-02/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 3: REST Connector                                      -->
+    <!-- ============================================================ -->
+    <section id="cycle-3">
+      <h2>Cycle 3: REST Connector &mdash; Calling the Enrichment API (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 2</div>
+        <p>Your flow captures <code>customerId</code> from the URL, logs it, and returns a placeholder JSON. Now it's time to replace that placeholder with <strong>real data from an external REST API</strong>.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;http:request&gt;</code></h3>
+
+      <p>The <strong>HTTP Request</strong> connector is the first "connector card" you'll use. While the HTTP Listener (already in your main flow) receives <em>inbound</em> requests from clients, the HTTP Request connector makes <em>outbound</em> calls to external APIs. Think of it as your Mule app acting as a client itself.</p>
+
+      <p>Every connector in Mule has two pieces:</p>
+      <ol>
+        <li><strong>Global configuration</strong> &mdash; defines <em>where</em> to connect (host, port, base path). Created once in <code>global-config.xml</code>, reused across flows.</li>
+        <li><strong>Operation</strong> &mdash; defines <em>what</em> to do (HTTP method, path, parameters). Placed inside your flow.</li>
+      </ol>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Flow["get:\customers\(customerId):api-config"]
+        SV["Set Variable"]
+        LOG["Logger"]
+        HR["HTTP Request\n(NEW card)"]
+        TM["Transform Message"]
+        SV --> LOG --> HR --> TM
+    end
+    subgraph GlobalConfig["global-config.xml"]
+        GC["http:request-config\nname='Enrichment_API'\nhost, port, basePath"]
+    end
+    GC -.->|"config-ref"| HR
+    HR -->|"GET /api/enrich/ACCT-001"| EXT["REST API :8090"]
+    EXT -->|"JSON"| HR
+
+    classDef newStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+    classDef gcStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef extStyle fill:#059669,stroke:#047857,color:#fff
+
+    class HR newStyle
+    class SV,LOG,TM existStyle
+    class GC gcStyle
+    class EXT extStyle
+        </pre>
+        <p class="diagram-caption">Figure 5a: Cycle 3 flow evolution &mdash; HTTP Request card (red = new) inserted between Logger and Transform. It references a global config and calls the external REST API.</p>
+      </div>
+
+      <h3>Concept: HTTP Request Connector (Outbound)</h3>
+
+      <p>Your Mule application received an inbound request via the HTTP Listener. Now it needs to make an <em>outbound</em> call to another REST API &mdash; the enrichment service. The HTTP Request connector is the outbound counterpart: it sends requests to external systems and returns their responses as the new payload.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph YourMuleApp["Your Mule Application"]
+        FLOW["Flow"] --> REQ["HTTP Request\nConnector"]
+    end
+    REQ -->|"GET /api/enrich/ACCT-001"| EXT["External REST API\nFastAPI :8090"]
+    EXT -->|"JSON Response"| REQ
+
+    subgraph ResponsePayload["Response Payload"]
+        R1["companyName"]
+        R2["industry"]
+        R3["employeeCount"]
+        R4["revenue"]
+    end
+
+    classDef muleStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef extStyle fill:#059669,stroke:#047857,color:#fff
+    classDef respStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class FLOW,REQ muleStyle
+    class EXT extStyle
+    class R1,R2,R3,R4 respStyle
+        </pre>
+        <p class="diagram-caption">Figure 5: HTTP Request connector makes an outbound call to the enrichment API and receives company data</p>
+      </div>
+
+      <p>The connector has two parts: a <strong>global configuration</strong> (connection details like host, port, and base path) and the <strong>operation</strong> (the specific request &mdash; method, path, parameters). This separation means you configure the connection once and reuse it across multiple operations.</p>
+
+      <h3>Code: REST Connector Setup</h3>
+
+      <h4>Global Configuration (global-config.xml)</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- Connection config for the enrichment REST API --&gt;
+&lt;http:request-config name="Enrichment_API" basePath="/api"&gt;
+    &lt;http:request-connection host="${enrichment.api.host}"
+                             port="${enrichment.api.port}"/&gt;
+&lt;/http:request-config&gt;</code></pre>
+
+      <h4>HTTP Request with Dynamic URI Parameters</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- Call GET /api/enrich/{customerId} on the enrichment API --&gt;
+&lt;http:request config-ref="Enrichment_API" method="GET"
+              path="/enrich/{customerId}"&gt;
+    &lt;http:uri-params&gt;&lt;![CDATA[#[{customerId: vars.customerId}]]]&gt;&lt;/http:uri-params&gt;
+&lt;/http:request&gt;</code></pre>
+
+      <h4>Transform to Extract Enrichment Fields</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  company: payload.companyName,
+  industry: payload.industry,
+  employees: payload.employeeCount,
+  revenue: payload.revenue
+}</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Where Does the Enrichment API Run?</div>
+        <p>The enrichment API is a FastAPI service running on port <strong>8090</strong>. In the classroom, it runs on the instructor's EC2 instance (or your local Docker setup). The endpoint <code>GET /api/enrich/{customer_id}</code> returns company details for any of the 10 canonical customers (ACCT-001 through ACCT-010).</p>
+      </div>
+
+      <!-- Lab 3 -->
+      <section class="lab-section">
+        <h2>Lab: Connect to the Enrichment REST API</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add HTTP Request Global Config</h4>
+            <p>Open your global config file in canvas mode. Click <code>+</code> at the global level &rarr; search <strong>"HTTP"</strong> &rarr; select <strong>Request configuration</strong>. Configure in the properties panel:</p>
+            <ul>
+              <li><strong>Name</strong>: <code>Enrichment_API</code></li>
+              <li><strong>Base Path</strong>: <code>/api</code></li>
+              <li><strong>Host</strong>: <code>localhost</code></li>
+              <li><strong>Port</strong>: <code>8090</code></li>
+            </ul>
+            <div class="validation">Validation: No red error markers. Switch to XML view &mdash; you should see <code>&lt;http:request-config name="Enrichment_API"&gt;</code>.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Create Sub-Flow and Add HTTP Request</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. Click <strong>+ Add Flow</strong> at the bottom &rarr; name it <code>get-enrichment-data</code> &rarr; change type to <strong>Sub-Flow</strong>. Inside the sub-flow, click <code>+</code> &rarr; search <strong>"HTTP"</strong> &rarr; select <strong>Request</strong>. Configure:</p>
+            <ul>
+              <li><strong>Connector configuration</strong>: select <code>Enrichment_API</code> from dropdown</li>
+              <li><strong>Method</strong>: <code>GET</code></li>
+              <li><strong>Path</strong>: <code>/enrich/{customerId}</code></li>
+              <li><strong>URI Parameters</strong>: click <code>+</code>, Key = <code>customerId</code>, Value = <code>#[vars.customerId]</code></li>
+            </ul>
+            <p>Then in the main flow, after the Logger, click <code>+</code> &rarr; search <strong>"Flow Reference"</strong> &rarr; select it &rarr; set <strong>Flow name</strong> to <code>get-enrichment-data</code>.</p>
+            <div class="validation">Validation: No XML errors. Canvas shows the Flow Reference card pointing to the sub-flow.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Update Transform and Test</h4>
+            <p>Click your Transform Message &rarr; <strong>Edit</strong> &rarr; update the DataWeave to extract the enrichment response fields (companyName, industry, employeeCount, revenue). Restart the Mule app and test:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: Response includes <code>"company": "Romaguera-Crona"</code>, <code>"industry": "Technology"</code>.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-03/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 4: Database Connector                                  -->
+    <!-- ============================================================ -->
+    <section id="cycle-4">
+      <h2>Cycle 4: Database Connector &mdash; PostgreSQL (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 3</div>
+        <p>Your flow now calls the enrichment REST API and returns real company data (companyName, industry, employees, revenue). Next: add a <strong>second data source &mdash; a PostgreSQL database</strong>.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;db:select&gt;</code></h3>
+
+      <p>The <strong>Database Select</strong> card runs a SQL query against a database and returns the result set as the new payload. Like the HTTP Request connector, it has two pieces: a global config (connection URL, credentials) and an operation (the SQL query). The key difference is that database queries use <strong>parameterized SQL</strong> with <code>:paramName</code> placeholders instead of URL path parameters.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Flow["get:\customers\(customerId):api-config"]
+        SV["Set Variable"]
+        LOG["Logger"]
+        HR["HTTP Request"]
+        SF1["flow-ref\nget-customer-score"]
+        TM["Transform Message"]
+        SV --> LOG --> HR --> SF1 --> TM
+    end
+    subgraph SubFlow["sub-flow: get-customer-score"]
+        DBS["DB Select\n(NEW card)"]
+    end
+    SF1 -.-> DBS
+    subgraph GlobalConfig["global-config.xml"]
+        GC["db:config\nname='PostgreSQL_Config'\nJDBC URL, user, password"]
+    end
+    GC -.->|"config-ref"| DBS
+    DBS -->|"SQL query"| PG[("PostgreSQL :5432")]
+    PG -->|"Result set"| DBS
+
+    classDef newStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+    classDef gcStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class DBS,SF1 newStyle
+    class SV,LOG,HR,TM existStyle
+    class GC gcStyle
+        </pre>
+        <p class="diagram-caption">Figure 6a: Cycle 4 flow evolution &mdash; a new sub-flow with DB Select (red) is called via flow-ref. Sub-flows keep your main flow clean and reusable.</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">New Concept: Sub-Flows</div>
+        <p>Instead of putting the database query directly in your main flow, you'll create a <strong>sub-flow</strong> &mdash; a reusable block of logic that you call with <code>&lt;flow-ref&gt;</code>. Sub-flows keep your main flow readable and let you reuse logic across multiple flows. Think of them like functions.</p>
+      </div>
+
+      <h3>Concept: Database Connector</h3>
+
+      <p>The REST API gave you company information. Now you'll add a second data source: a PostgreSQL database that stores customer credit scores and segments. The Database connector lets you run parameterized SQL queries and returns the result set as a Java list that DataWeave can process like any other array.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph YourMuleApp["Your Mule Application"]
+        FLOW["Flow"] --> DB["Database\nConnector"]
+    end
+    DB -->|"SELECT score, segment\nWHERE customer_id = :id"| PG[("PostgreSQL\n:5432")]
+    PG -->|"Result Set"| DB
+
+    subgraph ResultSet["payload 0 "]
+        S1[".score = 85"]
+        S2[".segment = 'premium'"]
+    end
+
+    classDef muleStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef dbStyle fill:#059669,stroke:#047857,color:#fff
+    classDef resStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class FLOW,DB muleStyle
+    class PG dbStyle
+    class S1,S2 resStyle
+        </pre>
+        <p class="diagram-caption">Figure 6: Database connector queries PostgreSQL and returns a result set accessible via <code>payload[0]</code></p>
+      </div>
+
+      <p>Two things you need to set up before using the Database connector:</p>
+      <ol>
+        <li><strong>Maven dependency</strong> &mdash; the PostgreSQL JDBC driver is not included by default. You must add it to <code>pom.xml</code>.</li>
+        <li><strong>Global configuration</strong> &mdash; a <code>&lt;db:config&gt;</code> element with the JDBC connection URL, username, and password.</li>
+      </ol>
+
+      <h3>Code: Database Connector Setup</h3>
+
+      <h4>Maven Dependency (pom.xml)</h4>
+      <pre class="language-xml" data-label="pom.xml"><code class="language-xml">&lt;!-- PostgreSQL JDBC driver --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;version&gt;42.7.1&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Mule Database connector (if not already present) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.mule.connectors&lt;/groupId&gt;
+    &lt;artifactId&gt;mule-db-connector&lt;/artifactId&gt;
+    &lt;version&gt;1.14.6&lt;/version&gt;
+    &lt;classifier&gt;mule-plugin&lt;/classifier&gt;
+&lt;/dependency&gt;</code></pre>
+
+      <h4>Global Configuration (global-config.xml)</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;db:config name="PostgreSQL_Config" doc:name="PostgreSQL Config"&gt;
+    &lt;db:generic-connection
+        url="jdbc:postgresql://${db.host}:${db.port}/${db.name}"
+        user="${db.user}"
+        password="${db.password}"
+        driverClassName="org.postgresql.Driver"/&gt;
+&lt;/db:config&gt;</code></pre>
+
+      <h4>Parameterized SELECT Query</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;db:select config-ref="PostgreSQL_Config" doc:name="Query customer score"&gt;
+    &lt;db:sql&gt;SELECT score, segment, last_updated
+           FROM customer_scores
+           WHERE customer_id = :customerId&lt;/db:sql&gt;
+    &lt;db:input-parameters&gt;&lt;![CDATA[#[{customerId: vars.customerId}]]]&gt;&lt;/db:input-parameters&gt;
+&lt;/db:select&gt;</code></pre>
+
+      <h4>Accessing Results in DataWeave</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// DB Select returns an array of rows — use [0] for single-row results
+payload[0].score     // → 85
+payload[0].segment   // → "premium"</code></pre>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Always Use Parameterized Queries</div>
+        <p>Never concatenate user input into SQL strings. The <code>:paramName</code> syntax prevents SQL injection by design. The Database connector handles escaping and type conversion automatically.</p>
+      </div>
+
+      <!-- Lab 4 -->
+      <section class="lab-section">
+        <h2>Lab: Query the Customer Score Database</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add Database Connector via Exchange</h4>
+            <p>You need two dependencies: the Mule Database connector and the PostgreSQL JDBC driver. In ACB, open the canvas of <code>global.xml</code>. Click <code>+</code> &rarr; search <strong>"Database"</strong>. If the connector isn't found locally, click <strong>Search in Exchange</strong> &rarr; select <strong>Database Connector - Mule 4</strong> &rarr; <strong>Add to project</strong>. ACB adds the Maven dependency to <code>pom.xml</code> automatically.</p>
+            <p>For the PostgreSQL JDBC driver, open <code>pom.xml</code> and add manually inside <code>&lt;dependencies&gt;</code>:</p>
+            <pre class="language-xml" data-label="pom.xml"><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;version&gt;42.7.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+            <div class="validation">Validation: No Maven errors in the terminal. Both dependencies resolve successfully.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Add Database Global Config</h4>
+            <p>In the <code>global.xml</code> canvas, click <code>+</code> &rarr; search <strong>"Database"</strong> &rarr; select <strong>Database Config</strong> (the global configuration element). In the properties panel, configure:</p>
+            <ul>
+              <li><strong>Name</strong>: <code>PostgreSQL_Config</code></li>
+              <li><strong>Connection</strong>: select <strong>Generic Connection</strong></li>
+              <li><strong>URL</strong>: <code>jdbc:postgresql://localhost:5432/customer360</code></li>
+              <li><strong>Driver class name</strong>: <code>org.postgresql.Driver</code></li>
+              <li><strong>User</strong>: <code>mulesoft</code></li>
+              <li><strong>Password</strong>: <code>mulesoft</code></li>
+            </ul>
+            <p>Click <strong>Test Connection</strong> to verify connectivity. Switch to XML view to confirm <code>&lt;db:config name="PostgreSQL_Config"&gt;</code> was created.</p>
+            <div class="validation">Validation: Test Connection succeeds (green checkmark). No red error markers in global.xml.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Create Sub-Flow with Database Select</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. Click <strong>+ Add Flow</strong> at the bottom &rarr; name it <code>get-customer-score</code> &rarr; change type to <strong>Sub-Flow</strong>. Inside the sub-flow, click <code>+</code> &rarr; search <strong>"Database"</strong> &rarr; select <strong>Select</strong>. Configure in the properties panel:</p>
+            <ul>
+              <li><strong>Connector configuration</strong>: select <code>PostgreSQL_Config</code> from dropdown</li>
+              <li><strong>SQL Query Text</strong>: <code>SELECT score, segment, last_updated FROM customer_scores WHERE customer_id = :customerId</code></li>
+              <li><strong>Input Parameters</strong>: click <code>+</code> &rarr; enter <code>#[{customerId: vars.customerId}]</code></li>
+            </ul>
+            <div class="validation">Validation: No XML errors. Canvas shows the Sub-Flow with a Database Select card inside.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Add Flow Reference and Update Transform</h4>
+            <p>In the main <code>get:\customers\(customerId):api-config</code> flow, click <code>+</code> after the HTTP Request (or the existing Flow Reference) &rarr; search <strong>"Flow Reference"</strong> &rarr; select it &rarr; set <strong>Flow name</strong> to <code>get-customer-score</code>.</p>
+            <p>Click your Transform Message &rarr; <strong>Edit</strong> &rarr; update the DataWeave to include <code>score</code> and <code>segment</code> from <code>payload[0]</code> (DB Select returns an array). Restart and test:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: Response includes <code>"score": 85</code> and <code>"segment": "premium"</code> for ACCT-001.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-04/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 5: SOAP Connector                                      -->
+    <!-- ============================================================ -->
+    <section id="cycle-5">
+      <h2>Cycle 5: SOAP Connector &mdash; Web Service Consumer (30 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 4</div>
+        <p>Your flow now calls <strong>two data sources</strong>: REST (company info) and PostgreSQL (credit score). Next: add a <strong>third data source &mdash; a SOAP web service</strong> for address validation.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;wsc:consume&gt;</code></h3>
+
+      <p>The <strong>Web Service Consumer</strong> (WSC) card calls SOAP web services. Unlike REST connectors where you just set a URL and method, SOAP requires a <strong>WSDL</strong> file that describes the service contract (operations, data types, and the XML namespace). The WSC connector reads the WSDL and handles all the SOAP envelope wrapping/unwrapping for you. Your job is to build the request body in DataWeave using the correct XML namespace.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph LR
+    subgraph Flow["get:\customers\(customerId):api-config"]
+        SV["Set Variable"]
+        LOG["Logger"]
+        HR["HTTP Request"]
+        SF1["flow-ref\nget-customer-score"]
+        SF2["flow-ref\nvalidate-address"]
+        TM["Transform Message"]
+        SV --> LOG --> HR --> SF1 --> SF2 --> TM
+    end
+    subgraph SubFlowSOAP["sub-flow: validate-address"]
+        WSC["WSC Consume\n(NEW card)"]
+    end
+    SF2 -.-> WSC
+    WSC -->|"SOAP Request"| SOAP["SOAP Service :8091"]
+    SOAP -->|"SOAP Response"| WSC
+
+    classDef newStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+
+    class WSC,SF2 newStyle
+    class SV,LOG,HR,SF1,TM existStyle
+        </pre>
+        <p class="diagram-caption">Figure 7a: Cycle 5 flow evolution &mdash; WSC Consume card (red = new) in a sub-flow called via flow-ref. Three data sources now feed your response.</p>
+      </div>
+
+      <h3>Concept: Web Service Consumer (WSC)</h3>
+
+      <p>Not every integration target speaks REST. The address validation service exposes a SOAP endpoint, which means XML envelopes, WSDL contracts, and XML namespaces. Mule's Web Service Consumer (WSC) connector handles all the SOAP envelope wrapping and unwrapping &mdash; you just need to provide the WSDL location and build the request body with DataWeave.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+sequenceDiagram
+    participant Flow as Mule Flow
+    participant WSC as Web Service Consumer
+    participant SOAP as SOAP Service :8091
+
+    Flow->>WSC: Build XML body with DataWeave
+    WSC->>SOAP: SOAP Request (ValidateAddress)
+    SOAP-->>WSC: SOAP Response (isValid, confidence)
+    WSC-->>Flow: Parsed payload
+        </pre>
+        <p class="diagram-caption">Figure 7: Web Service Consumer wraps your DataWeave body in a SOAP envelope, sends it, and returns the parsed response</p>
+      </div>
+
+      <p>The tricky part of SOAP is <strong>namespaces</strong>. Every SOAP operation lives in an XML namespace defined in the WSDL. You need to declare that namespace in your DataWeave body so the SOAP service can route your request to the correct operation. The easiest way to find the namespace is to open the WSDL URL in a browser and look for the <code>targetNamespace</code> attribute.</p>
+
+      <h3>Code: SOAP Connector Setup</h3>
+
+      <h4>Maven Dependency (pom.xml)</h4>
+      <pre class="language-xml" data-label="pom.xml"><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.mule.connectors&lt;/groupId&gt;
+    &lt;artifactId&gt;mule-wsc-connector&lt;/artifactId&gt;
+    &lt;version&gt;1.7.3&lt;/version&gt;
+    &lt;classifier&gt;mule-plugin&lt;/classifier&gt;
+&lt;/dependency&gt;</code></pre>
+
+      <h4>Global Configuration (global-config.xml)</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;wsc:config name="Address_Validation" doc:name="Address Validation WSC"&gt;
+    &lt;wsc:connection wsdlLocation="${soap.address.wsdl}"
+                    service="AddressService"
+                    port="AddressPort"/&gt;
+&lt;/wsc:config&gt;</code></pre>
+
+      <h4>Consume Operation with DataWeave SOAP Body</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;wsc:consume config-ref="Address_Validation"
+             operation="ValidateAddress"
+             doc:name="Validate Address"&gt;
+    &lt;wsc:message&gt;
+        &lt;wsc:body&gt;&lt;![CDATA[#[%dw 2.0
+output application/xml
+ns addr http://example.com/address
+---
+addr#ValidateAddress: {
+    addr#street: "123 Innovation Drive",
+    addr#city: "Austin",
+    addr#state: "TX",
+    addr#postalCode: "78701"
+}]]]&gt;&lt;/wsc:body&gt;
+    &lt;/wsc:message&gt;
+&lt;/wsc:consume&gt;</code></pre>
+
+      <h4>Parsing the SOAP Response</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// WSC returns the SOAP body as XML — navigate to the response element
+payload.body.ValidateAddressResponse.isValid      // → true
+payload.body.ValidateAddressResponse.confidence   // → 92</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Finding the SOAP Namespace</div>
+        <p>Open the WSDL URL in your browser: <code>http://localhost:8091/?wsdl</code>. Look for <code>targetNamespace="http://example.com/address"</code>. That's the namespace you use in DataWeave with <code>ns addr http://example.com/address</code>. The <code>addr#</code> prefix before element names tells DataWeave to use that namespace.</p>
+      </div>
+
+      <!-- Lab 5 -->
+      <section class="lab-section">
+        <h2>Lab: Add SOAP Address Validation</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add Web Service Consumer Connector</h4>
+            <p>Open the <code>global.xml</code> canvas. Click <code>+</code> &rarr; search <strong>"Web Service Consumer"</strong>. If not found locally, click <strong>Search in Exchange</strong> &rarr; select <strong>Web Service Consumer - Mule 4</strong> &rarr; <strong>Add to project</strong>. ACB adds the dependency to <code>pom.xml</code> automatically.</p>
+            <p>Now add the global config: click <code>+</code> &rarr; search <strong>"Web Service Consumer"</strong> &rarr; select <strong>Web Service Consumer Config</strong>. Configure:</p>
+            <ul>
+              <li><strong>Name</strong>: <code>Address_Validation</code></li>
+              <li><strong>WSDL Location</strong>: <code>http://localhost:8091/?wsdl</code></li>
+              <li><strong>Service</strong>: <code>AddressService</code></li>
+              <li><strong>Port</strong>: <code>AddressPort</code></li>
+            </ul>
+            <div class="validation">Validation: No red error markers. Switch to XML view &mdash; you should see <code>&lt;wsc:config name="Address_Validation"&gt;</code>.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Create Sub-Flow with WSC Consume</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. Click <strong>+ Add Flow</strong> at the bottom &rarr; name it <code>validate-address</code> &rarr; change type to <strong>Sub-Flow</strong>. Inside it, click <code>+</code> &rarr; search <strong>"Web Service Consumer"</strong> &rarr; select <strong>Consume</strong>. Configure:</p>
+            <ul>
+              <li><strong>Connector configuration</strong>: select <code>Address_Validation</code> from dropdown</li>
+              <li><strong>Operation</strong>: <code>ValidateAddress</code></li>
+            </ul>
+            <p>For the SOAP body, click the <strong>Body</strong> field &rarr; open the DataWeave editor and write:</p>
+            <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/xml
+ns addr http://example.com/address
+---
+addr#ValidateAddress: {
+    addr#street: "123 Innovation Drive",
+    addr#city: "Austin",
+    addr#state: "TX",
+    addr#postalCode: "78701"
+}</code></pre>
+            <p><strong>Key detail:</strong> the <code>ns addr http://example.com/address</code> namespace must match the <code>targetNamespace</code> in the WSDL. Open <code>http://localhost:8091/?wsdl</code> in a browser to verify.</p>
+            <div class="validation">Validation: No XML errors. Canvas shows the Sub-Flow with a WSC Consume card inside.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Add Flow Reference, Update Transform, and Test</h4>
+            <p>In the main flow, click <code>+</code> after the DB Flow Reference &rarr; search <strong>"Flow Reference"</strong> &rarr; select it &rarr; set <strong>Flow name</strong> to <code>validate-address</code>.</p>
+            <p>Click your Transform Message &rarr; <strong>Edit</strong> &rarr; add <code>addressValid</code> and <code>addressConfidence</code> fields. The SOAP response is accessed via <code>payload.body.ValidateAddressResponse</code>. Restart and test:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: Response includes <code>"addressValid": true</code> and an <code>"addressConfidence"</code> number (85&ndash;95 for known customers).</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-05/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 6: Global Elements & Refactoring                       -->
+    <!-- ============================================================ -->
+    <section id="cycle-6">
+      <h2>Cycle 6: Global Elements &amp; Refactoring (30 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 5</div>
+        <p>Your flow calls <strong>three data sources sequentially</strong>: REST, PostgreSQL, and SOAP. It works, but all connection details are hardcoded. Time to <strong>clean up</strong>.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;configuration-properties&gt;</code></h3>
+
+      <p>The <strong>Configuration Properties</strong> element loads key-value pairs from a <code>.properties</code> file and makes them available throughout your Mule application. Instead of hardcoding <code>host="localhost"</code> in your XML, you write <code>host="${enrichment.api.host}"</code> and define the actual value in the properties file. This isn't a flow card &mdash; it's a global element that sits at the top of your configuration.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Before["Before: Hardcoded in XML"]
+        GC1["global-config.xml\nhost='localhost'\nport='8090'\nurl='jdbc:...'"]
+    end
+    subgraph After["After: Properties File"]
+        PROPS["application.properties\nenrichment.api.host=localhost\nenrichment.api.port=8090\ndb.host=localhost"]
+        CP["configuration-properties\n(NEW element)"]
+        GC2["global-config.xml\nhost='dollar-brace enrichment.api.host'\nport='dollar-brace enrichment.api.port'"]
+        PROPS --> CP --> GC2
+    end
+
+    classDef badStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef newStyle fill:#059669,stroke:#047857,color:#fff
+    classDef goodStyle fill:#0078D4,stroke:#005A9E,color:#fff
+
+    class GC1 badStyle
+    class PROPS,CP newStyle
+    class GC2 goodStyle
+        </pre>
+        <p class="diagram-caption">Figure 8a: Cycle 6 &mdash; hardcoded values (red) are replaced with property placeholders (blue), loaded by the configuration-properties element (green).</p>
+      </div>
+
+      <h3>Concept: Externalize Configuration</h3>
+
+      <p>If you followed the demos exactly, your global configs have hardcoded values like <code>host="localhost"</code> and <code>port="8090"</code>. That works for development, but falls apart when you deploy to different environments (staging, production, cloud). The Mule way is to externalize all configuration into a <strong>properties file</strong> and reference values with <code>${property.name}</code> placeholders.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Before["Before: Hardcoded Values"]
+        F1["global-config.xml"] --- C1["host='localhost'\nport='8090'"]
+        F1 --- C2["url='jdbc:postgresql://localhost:5432...'"]
+        F1 --- C3["wsdlLocation='http://localhost:8091...'"]
+    end
+
+    subgraph After["After: Properties + Placeholders"]
+        P["application.properties\n(one file, all values)"] --> GC["global-config.xml\nuses dollar-brace placeholders"]
+        GC --> F2["implementation.xml"]
+        GC --> F3["main.xml"]
+    end
+
+    classDef badStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef goodStyle fill:#059669,stroke:#047857,color:#fff
+    classDef fileStyle fill:#0078D4,stroke:#005A9E,color:#fff
+
+    class C1,C2,C3 badStyle
+    class P goodStyle
+    class GC,F2,F3 fileStyle
+        </pre>
+        <p class="diagram-caption">Figure 8: Before &mdash; hardcoded values scattered across XML. After &mdash; one properties file, clean placeholders.</p>
+      </div>
+
+      <h3>Code: Properties File and Placeholders</h3>
+
+      <h4>application.properties</h4>
+      <pre class="language-properties" data-label="application.properties"><code class="language-properties"># HTTP Listener
+http.host=0.0.0.0
+http.port=8081
+
+# REST Enrichment API
+enrichment.api.host=localhost
+enrichment.api.port=8090
+enrichment.api.basePath=/api
+
+# PostgreSQL
+db.host=localhost
+db.port=5432
+db.name=customer360
+db.user=mulesoft
+db.password=mulesoft
+
+# SOAP Address Validation
+soap.address.wsdl=http://localhost:8091/?wsdl</code></pre>
+
+      <h4>Load Properties (global-config.xml)</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- Must be the first element inside &lt;mule&gt; --&gt;
+&lt;configuration-properties file="application.properties"
+                          doc:name="Configuration properties"/&gt;</code></pre>
+
+      <h4>Using Placeholders in Global Config</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;!-- Before: host="localhost" port="8090" --&gt;
+&lt;!-- After: uses property placeholders --&gt;
+&lt;http:request-config name="Enrichment_API"
+                     basePath="${enrichment.api.basePath}"&gt;
+    &lt;http:request-connection host="${enrichment.api.host}"
+                             port="${enrichment.api.port}"/&gt;
+&lt;/http:request-config&gt;</code></pre>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Why This Matters</div>
+        <p>In production, you set properties via Runtime Manager &mdash; no code changes, no redeployment for configuration changes. Sensitive values like passwords use encrypted properties or secure vaults. The placeholder syntax <code>${property.name}</code> works everywhere in Mule XML.</p>
+      </div>
+
+      <!-- Lab 6 -->
+      <section class="lab-section">
+        <h2>Lab: Externalize Configuration</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Create application.properties</h4>
+            <p>In ACB's Explorer panel, right-click <code>src/main/resources/</code> &rarr; <strong>New File</strong> &rarr; name it <code>application.properties</code>. Add all connection details as key-value pairs:</p>
+            <pre class="language-properties" data-label="application.properties"><code class="language-properties"># HTTP Listener
+http.host=0.0.0.0
+http.port=8081
+
+# REST Enrichment API
+enrichment.api.host=localhost
+enrichment.api.port=8090
+enrichment.api.basePath=/api
+
+# PostgreSQL
+db.host=localhost
+db.port=5432
+db.name=customer360
+db.user=mulesoft
+db.password=mulesoft
+
+# SOAP Address Validation
+soap.address.wsdl=http://localhost:8091/?wsdl</code></pre>
+            <div class="validation">Validation: File exists at <code>src/main/resources/application.properties</code> with all required keys.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Add Configuration Properties Element</h4>
+            <p>Open <code>global.xml</code> in canvas mode. Click <code>+</code> &rarr; search <strong>"Configuration properties"</strong> &rarr; select it. In the properties panel, set <strong>File</strong> to <code>application.properties</code>. This must be the <strong>first element</strong> in the file (before any connector configs).</p>
+            <p>Now update each global config to use <code>${property.name}</code> placeholders instead of hardcoded values. Click each connector config in the canvas and update:</p>
+            <ul>
+              <li><strong>HTTP Request</strong> (Enrichment_API): Host = <code>${enrichment.api.host}</code>, Port = <code>${enrichment.api.port}</code></li>
+              <li><strong>Database</strong> (PostgreSQL_Config): URL = <code>jdbc:postgresql://${db.host}:${db.port}/${db.name}</code>, User = <code>${db.user}</code>, Password = <code>${db.password}</code></li>
+              <li><strong>WSC</strong> (Address_Validation): WSDL Location = <code>${soap.address.wsdl}</code></li>
+            </ul>
+            <div class="validation">Validation: No hardcoded host, port, or password values in XML. All use <code>${...}</code> syntax.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Verify Everything Still Works</h4>
+            <p>Restart the Mule app. The behavior should be identical &mdash; properties are resolved at startup from the file. Re-run your tests:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: All endpoints return the same enriched data as before the refactoring. The only change is where config values live.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-06/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 7: Scatter-Gather                                      -->
+    <!-- ============================================================ -->
+    <section id="cycle-7">
+      <h2>Cycle 7: Scatter-Gather &amp; Parallelism (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 6</div>
+        <p>Your flow calls three data sources sequentially and all config is externalized in properties. But sequential execution is slow. Time to <strong>go parallel</strong>.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;scatter-gather&gt;</code></h3>
+
+      <p>The <strong>Scatter-Gather</strong> scope is a flow control card that takes multiple routes and executes them <strong>all at the same time</strong>. It "scatters" work to parallel threads and then "gathers" the results into a single payload once all routes complete. In the canvas view, it appears as a card that branches into multiple parallel lines.</p>
+
+      <p>This is a fundamental architectural change: instead of calling REST &rarr; DB &rarr; SOAP one after another (3 seconds total), Scatter-Gather calls all three simultaneously (1 second total &mdash; the slowest route).</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Sequential["Before: Sequential (3 seconds)"]
+        direction LR
+        A1["REST\n1 sec"] --> A2["DB\n1 sec"] --> A3["SOAP\n1 sec"]
+    end
+    subgraph Parallel["After: Scatter-Gather (1 second)"]
+        SG{"Scatter-\nGather"}
+        SG --> B1["REST\n1 sec"]
+        SG --> B2["DB\n1 sec"]
+        SG --> B3["SOAP\n1 sec"]
+        B1 --> MRG["Merge"]
+        B2 --> MRG
+        B3 --> MRG
+    end
+
+    classDef seqStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef parStyle fill:#059669,stroke:#047857,color:#fff
+    classDef sgStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class A1,A2,A3 seqStyle
+    class B1,B2,B3 parStyle
+    class SG sgStyle
+        </pre>
+        <p class="diagram-caption">Figure 9a: Sequential vs. Parallel &mdash; Scatter-Gather reduces latency from sum-of-all to max-of-all</p>
+      </div>
+
+      <h3>Concept: Parallel Execution with Scatter-Gather</h3>
+
+      <p>Right now your flow calls the REST API, then the database, then the SOAP service &mdash; sequentially. If each call takes one second, that's three seconds of latency. Scatter-Gather executes all three routes <em>in parallel</em> and waits for all to complete, reducing your total time to the duration of the slowest route. For three independent data sources, this is free performance.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    REQ["HTTP Request\nGET /customers/ACCT-001"] --> SG{"Scatter-Gather"}
+
+    SG -->|"Route 0"| R1["get-enrichment-data\nREST API :8090"]
+    SG -->|"Route 1"| R2["get-customer-score\nPostgreSQL :5432"]
+    SG -->|"Route 2"| R3["validate-address\nSOAP :8091"]
+
+    R1 --> MERGE["Transform Message\nMerge DataWeave"]
+    R2 --> MERGE
+    R3 --> MERGE
+
+    MERGE --> RESP["Unified JSON Response"]
+
+    classDef sgStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef r1Style fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef r2Style fill:#059669,stroke:#047857,color:#fff
+    classDef r3Style fill:#7C3AED,stroke:#6D28D9,color:#fff
+    classDef mergeStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+
+    class SG sgStyle
+    class R1 r1Style
+    class R2 r2Style
+    class R3 r3Style
+    class MERGE,RESP mergeStyle
+        </pre>
+        <p class="diagram-caption">Figure 9: Scatter-Gather runs all three enrichment routes in parallel, then merges the results</p>
+      </div>
+
+      <h3>Code: Scatter-Gather Setup</h3>
+
+      <h4>Scatter-Gather with Three Routes</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;scatter-gather doc:name="Parallel Enrichment"&gt;
+    &lt;route&gt;
+        &lt;!-- Route 0: REST enrichment --&gt;
+        &lt;flow-ref name="get-enrichment-data"/&gt;
+    &lt;/route&gt;
+    &lt;route&gt;
+        &lt;!-- Route 1: Database score --&gt;
+        &lt;flow-ref name="get-customer-score"/&gt;
+    &lt;/route&gt;
+    &lt;route&gt;
+        &lt;!-- Route 2: SOAP address validation --&gt;
+        &lt;flow-ref name="validate-address"/&gt;
+    &lt;/route&gt;
+&lt;/scatter-gather&gt;</code></pre>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Scatter-Gather Keys Are Strings</div>
+        <p>After Scatter-Gather, the payload is an object with <strong>string keys</strong> "0", "1", "2" &mdash; not numeric indices. You must use <code>payload."0"</code> with quotes, not <code>payload.0</code> (which tries to access a numeric field). Each value is a full Mule message with its own <code>.payload</code>, <code>.attributes</code>, etc.</p>
+      </div>
+
+      <h4>Accessing Route Results</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// Scatter-Gather output structure:
+// { "0": { payload: ..., attributes: ... },
+//   "1": { payload: ..., attributes: ... },
+//   "2": { payload: ..., attributes: ... } }
+
+payload."0".payload   // → Route 0 result (REST enrichment JSON)
+payload."1".payload   // → Route 1 result (DB result set array)
+payload."2".payload   // → Route 2 result (SOAP XML body)</code></pre>
+
+      <h4>Complete Merge Transform</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+var enrichment = payload."0".payload
+var scoreData  = payload."1".payload[0]
+var address    = payload."2".payload
+---
+{
+  customerId:        vars.customerId,
+  company:           enrichment.companyName,
+  industry:          enrichment.industry,
+  employees:         enrichment.employeeCount,
+  revenue:           enrichment.revenue,
+  score:             scoreData.score,
+  segment:           scoreData.segment,
+  addressValid:      address.body.ValidateAddressResponse.isValid,
+  addressConfidence: address.body.ValidateAddressResponse.confidence,
+  enrichedAt:        now()
+}</code></pre>
+
+      <!-- Lab 7 -->
+      <section class="lab-section">
+        <h2>Lab: Run Enrichments in Parallel</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add Scatter-Gather to the Flow</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. You need to replace the three sequential Flow References with a single Scatter-Gather. First, delete all three Flow Reference cards (click each &rarr; trash icon). Then click <code>+</code> after the Logger &rarr; search <strong>"Scatter-Gather"</strong> &rarr; select it.</p>
+            <p>The Scatter-Gather appears as a scope with parallel branches. Click <code>+</code> inside the <strong>first route</strong> &rarr; add a <strong>Flow Reference</strong> &rarr; set Flow name to <code>get-enrichment-data</code>. Click <strong>+ Add Route</strong> to create a second route &rarr; add a Flow Reference to <code>get-customer-score</code>. Click <strong>+ Add Route</strong> again &rarr; add a Flow Reference to <code>validate-address</code>.</p>
+
+            <div class="diagram-container">
+              <pre class="mermaid">
+graph LR
+    subgraph SG["Scatter-Gather (canvas view)"]
+        R0["Route 0\nget-enrichment-data"]
+        R1["Route 1\nget-customer-score"]
+        R2["Route 2\nvalidate-address"]
+    end
+    SG --> TM["Transform Message\n(merge results)"]
+
+    classDef routeStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef mergeStyle fill:#059669,stroke:#047857,color:#fff
+
+    class R0,R1,R2 routeStyle
+    class TM mergeStyle
+              </pre>
+              <p class="diagram-caption">What your canvas should look like: three parallel routes inside Scatter-Gather</p>
+            </div>
+            <div class="validation">Validation: Canvas shows Scatter-Gather with three parallel route branches, each containing one Flow Reference.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Update the Merge Transform</h4>
+            <p>Click <code>+</code> after the Scatter-Gather &rarr; search <strong>"Transform Message"</strong> &rarr; select it. (Delete the old Transform if it's still there.) Click the Transform &rarr; <strong>Edit</strong> &rarr; write the merge DataWeave that combines all three route results:</p>
+            <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+var enrichment = payload."0".payload
+var scoreData  = payload."1".payload[0]
+var address    = payload."2".payload
+---
+{
+  customerId:        vars.customerId,
+  company:           enrichment.companyName,
+  industry:          enrichment.industry,
+  employees:         enrichment.employeeCount,
+  revenue:           enrichment.revenue,
+  score:             scoreData.score,
+  segment:           scoreData.segment,
+  addressValid:      address.body.ValidateAddressResponse.isValid,
+  addressConfidence: address.body.ValidateAddressResponse.confidence,
+  enrichedAt:        now()
+}</code></pre>
+            <p><strong>Key detail:</strong> Scatter-Gather returns string keys (<code>"0"</code>, <code>"1"</code>, <code>"2"</code>) &mdash; you must use quotes: <code>payload."0".payload</code>, not <code>payload.0.payload</code>.</p>
+            <div class="validation">Validation: No DataWeave syntax errors. The transform references all three routes.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Test Parallel Execution</h4>
+            <p>Restart the Mule app and test the enrichment endpoint:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <p>Check the Mule console logs &mdash; you should see all three sub-flow executions starting nearly simultaneously (parallel threads), not sequentially.</p>
+            <div class="validation">Validation: Single JSON response includes <code>company</code>, <code>score</code>, AND <code>addressValid</code> &mdash; all three data sources merged. Response time should be noticeably faster than sequential.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-07/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 8: Choice Router                                       -->
+    <!-- ============================================================ -->
+    <section id="cycle-8">
+      <h2>Cycle 8: Choice Router &amp; Conditional Logic (30 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 7</div>
+        <p>Your flow runs all three enrichments in parallel with Scatter-Gather and merges the results. But callers always get <em>everything</em>. What if they only want one data source? Time to add <strong>conditional routing</strong>.</p>
+      </div>
+
+      <h3>New Component: <code>&lt;choice&gt;</code></h3>
+
+      <p>The <strong>Choice</strong> router is a flow control card that evaluates DataWeave expressions and sends the message down exactly one branch. It works like an if/else-if/else chain: the first <code>&lt;when&gt;</code> condition that evaluates to <code>true</code> wins. If none match, the <code>&lt;otherwise&gt;</code> branch executes. In the canvas view, the Choice router appears as a diamond-shaped decision card with multiple outgoing branches.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Flow["get:\customers\(customerId):api-config"]
+        SV["Set Variable"] --> LOG["Logger"]
+        LOG --> TRY["Try scope\n(coming in Cycle 9)"]
+        subgraph ChoiceBlock["Choice Router (NEW card)"]
+            C{"choice"}
+            C -->|"source = 'rest'"| W1["REST only"]
+            C -->|"source = 'db'"| W2["DB only"]
+            C -->|"source = 'soap'"| W3["SOAP only"]
+            C -->|"otherwise"| SG["Scatter-Gather\n(all 3)"]
+        end
+    end
+
+    classDef newStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+    classDef choiceStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class C newStyle
+    class W1,W2,W3 choiceStyle
+    class SV,LOG,SG existStyle
+        </pre>
+        <p class="diagram-caption">Figure 10a: Cycle 8 flow evolution &mdash; Choice Router (red = new) wraps the enrichment logic, routing to single sources or all via Scatter-Gather</p>
+      </div>
+
+      <h3>Concept: Conditional Routing</h3>
+
+      <p>Sometimes you don't want to call all three data sources. The Choice router lets you evaluate DataWeave expressions and execute different branches based on the result. You'll add a <code>?source=</code> query parameter that lets callers request data from a specific source (REST only, DB only, SOAP only) or all sources (the default Scatter-Gather path).</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+flowchart TD
+    REQ["GET /customers/ACCT-001?source=???"] --> CHOICE{"Choice Router"}
+
+    CHOICE -->|"source == 'rest'"| REST["get-enrichment-data\nREST only"]
+    CHOICE -->|"source == 'db'"| DB["get-customer-score\nDB only"]
+    CHOICE -->|"source == 'soap'"| SOAP["validate-address\nSOAP only"]
+    CHOICE -->|"otherwise\n(no param or 'all')"| SG["Scatter-Gather\nAll 3 sources"]
+
+    classDef choiceStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef restStyle fill:#0078D4,stroke:#005A9E,color:#fff
+    classDef dbStyle fill:#059669,stroke:#047857,color:#fff
+    classDef soapStyle fill:#7C3AED,stroke:#6D28D9,color:#fff
+    classDef sgStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+
+    class CHOICE choiceStyle
+    class REST restStyle
+    class DB dbStyle
+    class SOAP soapStyle
+    class SG sgStyle
+        </pre>
+        <p class="diagram-caption">Figure 10: Choice Router sends requests to different branches based on the <code>?source=</code> query parameter</p>
+      </div>
+
+      <h3>Code: Choice Router</h3>
+
+      <h4>Choice Router XML</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;choice doc:name="Route by source"&gt;
+    &lt;when expression="#[attributes.queryParams.source == 'rest']"&gt;
+        &lt;flow-ref name="get-enrichment-data"/&gt;
+        &lt;ee:transform doc:name="Format REST response"&gt;
+            &lt;ee:message&gt;
+                &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  company: payload.companyName,
+  industry: payload.industry,
+  employees: payload.employeeCount,
+  revenue: payload.revenue
+}]]&gt;&lt;/ee:set-payload&gt;
+            &lt;/ee:message&gt;
+        &lt;/ee:transform&gt;
+    &lt;/when&gt;
+    &lt;when expression="#[attributes.queryParams.source == 'db']"&gt;
+        &lt;flow-ref name="get-customer-score"/&gt;
+        &lt;ee:transform doc:name="Format DB response"&gt;
+            &lt;ee:message&gt;
+                &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  score: payload[0].score,
+  segment: payload[0].segment
+}]]&gt;&lt;/ee:set-payload&gt;
+            &lt;/ee:message&gt;
+        &lt;/ee:transform&gt;
+    &lt;/when&gt;
+    &lt;when expression="#[attributes.queryParams.source == 'soap']"&gt;
+        &lt;flow-ref name="validate-address"/&gt;
+        &lt;ee:transform doc:name="Format SOAP response"&gt;
+            &lt;ee:message&gt;
+                &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  customerId: vars.customerId,
+  addressValid: payload.body.ValidateAddressResponse.isValid,
+  addressConfidence: payload.body.ValidateAddressResponse.confidence
+}]]&gt;&lt;/ee:set-payload&gt;
+            &lt;/ee:message&gt;
+        &lt;/ee:transform&gt;
+    &lt;/when&gt;
+    &lt;otherwise&gt;
+        &lt;!-- Default: all sources in parallel --&gt;
+        &lt;scatter-gather&gt;
+            &lt;route&gt;&lt;flow-ref name="get-enrichment-data"/&gt;&lt;/route&gt;
+            &lt;route&gt;&lt;flow-ref name="get-customer-score"/&gt;&lt;/route&gt;
+            &lt;route&gt;&lt;flow-ref name="validate-address"/&gt;&lt;/route&gt;
+        &lt;/scatter-gather&gt;
+        &lt;ee:transform doc:name="Merge all sources"&gt;
+            &lt;!-- Full merge DataWeave from Cycle 7 --&gt;
+        &lt;/ee:transform&gt;
+    &lt;/otherwise&gt;
+&lt;/choice&gt;</code></pre>
+
+      <div class="callout callout-info">
+        <div class="callout-title">How Choice Evaluates</div>
+        <p>Choice evaluates <code>&lt;when&gt;</code> conditions top-to-bottom and executes the <strong>first match</strong>. If no <code>&lt;when&gt;</code> matches, it falls through to <code>&lt;otherwise&gt;</code>. This is like a switch/case or if/else-if chain. Each expression is a DataWeave boolean expression inside <code>#[...]</code>.</p>
+      </div>
+
+      <!-- Lab 8 -->
+      <section class="lab-section">
+        <h2>Lab: Add Conditional Routing</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add Choice Router to the Flow</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. You need to wrap the Scatter-Gather inside a Choice router. Click <code>+</code> after the Logger (before the Scatter-Gather) &rarr; search <strong>"Choice"</strong> &rarr; select it. The Choice router appears as a diamond-shaped card with a <strong>When</strong> branch and an <strong>Otherwise</strong> (Default) branch.</p>
+            <p>Add three <code>When</code> conditions by clicking <strong>+ Add When</strong> in the Choice scope. Configure each condition's <strong>Expression</strong> in the properties panel:</p>
+            <ul>
+              <li>When 1: <code>#[attributes.queryParams.source == 'rest']</code></li>
+              <li>When 2: <code>#[attributes.queryParams.source == 'db']</code></li>
+              <li>When 3: <code>#[attributes.queryParams.source == 'soap']</code></li>
+            </ul>
+            <p>Inside each When branch, click <code>+</code> &rarr; add a <strong>Flow Reference</strong> pointing to the corresponding sub-flow, followed by a <strong>Transform Message</strong> that formats just that source's data.</p>
+
+            <div class="diagram-container">
+              <pre class="mermaid">
+graph TD
+    C{"Choice Router"}
+    C -->|"source = 'rest'"| R1["Flow Ref: get-enrichment-data\n+ Transform (REST fields only)"]
+    C -->|"source = 'db'"| R2["Flow Ref: get-customer-score\n+ Transform (score fields only)"]
+    C -->|"source = 'soap'"| R3["Flow Ref: validate-address\n+ Transform (address fields only)"]
+    C -->|"Default (otherwise)"| SG["Scatter-Gather\n+ Merge Transform\n(all 3 sources)"]
+
+    classDef choiceStyle fill:#D97706,stroke:#B45309,color:#fff
+    classDef routeStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+
+    class C choiceStyle
+    class R1,R2,R3,SG routeStyle
+              </pre>
+              <p class="diagram-caption">What your Choice Router should look like: three When branches + Default (Otherwise)</p>
+            </div>
+            <div class="validation">Validation: Canvas shows Choice with four branches (3 When + 1 Otherwise). No XML errors.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Move Scatter-Gather into Otherwise</h4>
+            <p>Drag (or cut/paste in XML view) your existing Scatter-Gather and its merge Transform into the <strong>Otherwise</strong> (Default) branch of the Choice router. This path executes when no <code>?source=</code> parameter is provided &mdash; the full parallel enrichment from Cycle 7. Delete the old Scatter-Gather from its previous position if it's still there.</p>
+            <p><strong>Tip:</strong> This is often easier in XML view &mdash; switch to XML, cut the <code>&lt;scatter-gather&gt;...&lt;/scatter-gather&gt;</code> block, and paste it inside <code>&lt;otherwise&gt;</code>.</p>
+            <div class="validation">Validation: XML is well-formed. The Scatter-Gather is inside <code>&lt;otherwise&gt;</code>.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Test All Routing Paths</h4>
+            <p>Restart and test each scenario to verify conditional routing works:</p>
+            <pre class="language-bash"><code class="language-bash"># REST only
+curl -s "http://localhost:8081/api/customers/ACCT-001?source=rest" | python3 -m json.tool
+
+# DB only
+curl -s "http://localhost:8081/api/customers/ACCT-001?source=db" | python3 -m json.tool
+
+# SOAP only
+curl -s "http://localhost:8081/api/customers/ACCT-001?source=soap" | python3 -m json.tool
+
+# All sources (default — no parameter)
+curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: <code>?source=rest</code> returns only company/industry. <code>?source=db</code> returns only score/segment. <code>?source=soap</code> returns only address fields. No parameter returns the full merged response from all three sources.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-08/</code> to verify your project matches the expected state after this cycle.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CYCLE 9: Error Handling                                      -->
+    <!-- ============================================================ -->
+    <section id="cycle-9">
+      <h2>Cycle 9: Error Handling (45 min)</h2>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Progress: After Cycle 8</div>
+        <p>Your flow routes conditionally based on <code>?source=</code> and runs Scatter-Gather for the default path. But what happens when an external service is down? Right now: <strong>ugly stack trace</strong>. Time to add error handling.</p>
+      </div>
+
+      <h3>New Components: <code>&lt;try&gt;</code>, <code>&lt;on-error-continue&gt;</code>, <code>&lt;on-error-propagate&gt;</code></h3>
+
+      <p>The <strong>Try</strong> scope is a wrapper card that you place around risky operations. When an error occurs inside the Try scope, instead of crashing the entire flow, the error is caught by one of the error handlers you define. Think of it as try/catch from Java or Python.</p>
+
+      <p>Inside the Try scope's error handler, you have two types of error handler cards:</p>
+      <ul>
+        <li><strong><code>&lt;on-error-continue&gt;</code></strong> &mdash; catches the error and <em>recovers</em>. The flow continues normally with whatever payload you set. Use when you can return a meaningful response (like a 404 JSON error body).</li>
+        <li><strong><code>&lt;on-error-propagate&gt;</code></strong> &mdash; catches the error, runs handler logic (like logging), then <em>re-throws</em>. The flow fails. Use for unrecoverable errors that should bubble up to the global error handler.</li>
+      </ul>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph FinalFlow["Complete Flow — All 9 Cycles"]
+        SV["Set Variable\n(Cycle 2)"] --> LOG["Logger\n(Cycle 2)"]
+        LOG --> TRY["Try Scope (NEW)"]
+        subgraph TryBlock["Try Scope"]
+            CHOICE{"Choice Router\n(Cycle 8)"}
+            CHOICE -->|"rest"| R1["REST sub-flow\n(Cycle 3)"]
+            CHOICE -->|"db"| R2["DB sub-flow\n(Cycle 4)"]
+            CHOICE -->|"soap"| R3["SOAP sub-flow\n(Cycle 5)"]
+            CHOICE -->|"otherwise"| SG["Scatter-Gather\n(Cycle 7)"]
+        end
+        TRY --> |"Success"| RESP["JSON Response"]
+        TRY --> |"HTTP:NOT_FOUND"| E1["on-error-continue\n404 JSON"]
+        TRY --> |"*:CONNECTIVITY"| E2["on-error-continue\n503 JSON"]
+        TRY --> |"ANY"| E3["on-error-propagate\nLog + re-throw"]
+    end
+
+    classDef newStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+    classDef errContStyle fill:#059669,stroke:#047857,color:#fff
+    classDef errPropStyle fill:#D97706,stroke:#B45309,color:#fff
+
+    class TRY newStyle
+    class E1,E2 errContStyle
+    class E3 errPropStyle
+    class SV,LOG,CHOICE,R1,R2,R3,SG existStyle
+        </pre>
+        <p class="diagram-caption">Figure 11a: Complete flow after all 9 cycles &mdash; Try scope (red = new) wraps the Choice/Scatter-Gather logic with three error handlers</p>
+      </div>
+
+      <h3>Concept: Try Scope and Error Handlers</h3>
+
+      <p>Your integration calls three external systems. Any of them can fail: the REST API might return a 404, the database might be unreachable, the SOAP service might time out. Without error handling, a single failure crashes the entire request. The <strong>Try scope</strong> lets you catch specific error types and respond gracefully instead of blowing up.</p>
+
+      <p>Mule has two error handler types:</p>
+      <ul>
+        <li><strong>on-error-continue</strong> &mdash; catches the error and recovers. The flow continues as if nothing happened. Use this when you can return a meaningful response (like a 404 JSON).</li>
+        <li><strong>on-error-propagate</strong> &mdash; catches the error, executes handler logic (like logging), then re-throws. The flow fails. Use this for unrecoverable errors you want to log before they bubble up.</li>
+      </ul>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph TryScope["Try Scope"]
+        LOGIC["Business Logic\nChoice + Scatter-Gather"]
+    end
+
+    LOGIC -->|"HTTP:NOT_FOUND"| OEC1["on-error-continue\n→ 404 JSON"]
+    LOGIC -->|"*:CONNECTIVITY"| OEC2["on-error-continue\n→ 503 JSON"]
+    LOGIC -->|"ANY other error"| OEP["on-error-propagate\n→ Log + 500"]
+
+    OEC1 --> RESP1["customerId: INVALID-999\nerror: Customer not found"]
+    OEC2 --> RESP2["error: Service unavailable\ndetail: connection refused"]
+    OEP --> RESP3["Logged + re-thrown\nto global error handler"]
+
+    classDef tryStyle fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef contStyle fill:#059669,stroke:#047857,color:#fff
+    classDef propStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+
+    class LOGIC tryStyle
+    class OEC1,OEC2 contStyle
+    class OEP propStyle
+        </pre>
+        <p class="diagram-caption">Figure 11: Try scope catches errors &mdash; on-error-continue (green) recovers, on-error-propagate (red) logs and re-throws</p>
+      </div>
+
+      <h3>Code: Error Handling</h3>
+
+      <h4>Try Scope with Error Handlers</h4>
+      <pre class="language-xml" data-label="Mule XML"><code class="language-xml">&lt;try doc:name="Error handling wrapper"&gt;
+    &lt;!-- Your Choice router + Scatter-Gather goes here --&gt;
+
+    &lt;error-handler&gt;
+        &lt;!-- 404: Customer not found --&gt;
+        &lt;on-error-continue type="HTTP:NOT_FOUND"
+                            enableNotifications="false"
+                            logException="false"&gt;
+            &lt;ee:transform doc:name="404 Response"&gt;
+                &lt;ee:message&gt;
+                    &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  error: "Customer not found",
+  customerId: vars.customerId
+}]]&gt;&lt;/ee:set-payload&gt;
+                &lt;/ee:message&gt;
+            &lt;/ee:transform&gt;
+            &lt;set-variable variableName="httpStatus" value="404"/&gt;
+        &lt;/on-error-continue&gt;
+
+        &lt;!-- 503: Service unavailable --&gt;
+        &lt;on-error-continue type="HTTP:CONNECTIVITY, DB:CONNECTIVITY, WSC:CONNECTIVITY"
+                            enableNotifications="false"
+                            logException="false"&gt;
+            &lt;ee:transform doc:name="503 Response"&gt;
+                &lt;ee:message&gt;
+                    &lt;ee:set-payload&gt;&lt;![CDATA[%dw 2.0
+output application/json
+---
+{
+  error: "Service unavailable",
+  detail: error.description
+}]]&gt;&lt;/ee:set-payload&gt;
+                &lt;/ee:message&gt;
+            &lt;/ee:transform&gt;
+            &lt;set-variable variableName="httpStatus" value="503"/&gt;
+        &lt;/on-error-continue&gt;
+
+        &lt;!-- Catch-all: log and re-throw --&gt;
+        &lt;on-error-propagate type="ANY"&gt;
+            &lt;logger level="ERROR"
+                    message="#['Unhandled error: ' ++ error.description]"/&gt;
+        &lt;/on-error-propagate&gt;
+    &lt;/error-handler&gt;
+&lt;/try&gt;</code></pre>
+
+      <h4>Error Object Access in DataWeave</h4>
+      <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">// Inside an error handler, the 'error' variable is available
+error.description    // Human-readable message, e.g. "HTTP GET on ... returned 404"
+error.errorType      // Structured type, e.g. HTTP:NOT_FOUND
+error.cause          // Java exception (if applicable)</code></pre>
+
+      <div class="callout callout-success">
+        <div class="callout-title">on-error-continue vs. on-error-propagate</div>
+        <p><strong>on-error-continue</strong> = catch and recover. The flow continues normally with whatever payload you set in the handler. Use it when you can return a valid response (404 JSON, 503 JSON).</p>
+        <p><strong>on-error-propagate</strong> = catch, log, and re-throw. The flow fails and the error bubbles up to the parent error handler. Use it for unexpected errors you can't recover from.</p>
+      </div>
+
+      <!-- Lab 9 -->
+      <section class="lab-section">
+        <h2>Lab: Add Error Handling</h2>
+
+        <div class="lab-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Add Try Scope Around the Choice Router</h4>
+            <p>Open <code>implementation.xml</code> in canvas mode. Click <code>+</code> after the Logger (before the Choice router) &rarr; search <strong>"Try"</strong> &rarr; select it. The Try scope appears as a container card. You need to move your entire Choice router (with its Scatter-Gather inside) into the Try scope.</p>
+            <p><strong>Easiest approach:</strong> switch to XML view, cut the entire <code>&lt;choice&gt;...&lt;/choice&gt;</code> block, wrap it with <code>&lt;try&gt;...&lt;/try&gt;</code>, and paste it back. Switch back to canvas to verify the visual structure.</p>
+
+            <div class="diagram-container">
+              <pre class="mermaid">
+graph TD
+    SV["Set Variable"] --> LOG["Logger"]
+    LOG --> TRY["Try Scope"]
+    subgraph TryBlock["Inside Try"]
+        CHOICE{"Choice Router"}
+        CHOICE -->|"When branches"| ROUTES["Individual sources"]
+        CHOICE -->|"Otherwise"| SG["Scatter-Gather"]
+    end
+    TRY -->|"Success"| OK["JSON Response"]
+    TRY -->|"Error"| EH["Error Handlers"]
+
+    classDef tryStyle fill:#DC2626,stroke:#B91C1C,color:#fff
+    classDef existStyle fill:#6B7280,stroke:#4B5563,color:#fff
+
+    class TRY tryStyle
+    class SV,LOG,CHOICE,ROUTES,SG existStyle
+              </pre>
+              <p class="diagram-caption">Try scope wraps the Choice + Scatter-Gather &mdash; errors are caught instead of crashing</p>
+            </div>
+            <div class="validation">Validation: Canvas shows Try scope containing the Choice router. No XML errors.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Add Error Handler for NOT_FOUND</h4>
+            <p>In the canvas, click the Try scope &rarr; look for the <strong>Error Handling</strong> section at the bottom. Click <code>+</code> in the error handler area &rarr; search <strong>"On Error Continue"</strong> &rarr; select it. Configure in the properties panel:</p>
+            <ul>
+              <li><strong>Type</strong>: <code>HTTP:NOT_FOUND</code></li>
+              <li><strong>Enable Notifications</strong>: unchecked</li>
+              <li><strong>Log Exception</strong>: unchecked</li>
+            </ul>
+            <p>Inside this error handler, click <code>+</code> &rarr; add a <strong>Transform Message</strong> that returns a 404 JSON body:</p>
+            <pre class="language-javascript" data-label="DataWeave"><code class="language-javascript">%dw 2.0
+output application/json
+---
+{
+  error: "Customer not found",
+  customerId: vars.customerId
+}</code></pre>
+            <p>Then click <code>+</code> &rarr; add a <strong>Set Variable</strong> with Name = <code>httpStatus</code>, Value = <code>404</code>.</p>
+            <p>Test with an invalid customer ID:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/INVALID-999 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: Returns <code>{"error": "Customer not found", "customerId": "INVALID-999"}</code> instead of an ugly stack trace.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Add Error Handler for CONNECTIVITY</h4>
+            <p>Add another <strong>On Error Continue</strong> in the error handler area. Configure:</p>
+            <ul>
+              <li><strong>Type</strong>: <code>HTTP:CONNECTIVITY, DB:CONNECTIVITY, WSC:CONNECTIVITY</code></li>
+            </ul>
+            <p>Inside it, add a Transform that returns a 503 JSON body using <code>error.description</code> for details, plus a Set Variable for <code>httpStatus = 503</code>.</p>
+            <p>Test by stopping one of the backend services:</p>
+            <pre class="language-bash"><code class="language-bash"># Stop the REST API
+docker stop infrastructure-rest-api-1
+
+# Request should return 503
+curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool
+
+# Restart the service
+docker start infrastructure-rest-api-1</code></pre>
+            <div class="validation">Validation: With a stopped service, request returns <code>{"error": "Service unavailable", ...}</code> instead of crashing.</div>
+          </div>
+        </div>
+
+        <div class="lab-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Add Catch-All and Verify Full Happy Path</h4>
+            <p>Add one more error handler: click <code>+</code> in the error handler area &rarr; search <strong>"On Error Propagate"</strong> &rarr; select it. Set <strong>Type</strong> to <code>ANY</code>. Inside it, add a <strong>Logger</strong> with Message = <code>#['Unhandled error: ' ++ error.description]</code> and Level = <code>ERROR</code>.</p>
+            <p>Restart all services and verify the full happy path works:</p>
+            <pre class="language-bash"><code class="language-bash">curl -s http://localhost:8081/api/customers/ACCT-001 | python3 -m json.tool</code></pre>
+            <div class="validation">Validation: Full enriched response returns with company, score, and addressValid. Your Customer Enrichment Engine is complete and production-ready.</div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-title">Solution Checkpoint</div>
+          <p>Compare your work with <code>lab/solution-cycle-09/</code> to verify your project matches the final expected state. This is the complete Customer Enrichment Engine.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- CLOSING BANNER                                               -->
+    <!-- ============================================================ -->
+    <div class="closing-banner">
+      <h3>Customer Enrichment Engine &mdash; Complete</h3>
+      <p>You've built a production-ready Mule integration from scratch: scaffolded from a RAML spec, connected to REST, Database, and SOAP services, parallelized with Scatter-Gather, routed conditionally with Choice, and hardened with error handling. In Module 5, you'll master the DataWeave language that powers all of these transforms.</p>
+    </div>
+
+    <!-- Expected Final Response -->
+    <section id="final-response">
+      <h2>Expected Final Response</h2>
+      <p>After completing all 9 cycles, <code>GET /api/customers/ACCT-001</code> should return:</p>
+      <pre class="language-json"><code class="language-json">{
+  "customerId": "ACCT-001",
+  "company": "Romaguera-Crona",
+  "industry": "Technology",
+  "employees": 2500,
+  "revenue": 450000000,
+  "score": 85,
+  "segment": "premium",
+  "addressValid": true,
+  "addressConfidence": 92,
+  "enrichedAt": "2026-02-23T..."
+}</code></pre>
+    </section>
+
+    <!-- Footer Navigation -->
+    <footer class="module-footer">
+      <a href="../03-api-design/module-03.html">&larr; Module 3: Designing the Customer 360 API</a>
+      <a href="../05-dataweave/module-05.html">Next: Module 5 &mdash; Mastering DataWeave &rarr;</a>
+    </footer>
+
+  </main>
+
+</body>
+</html>

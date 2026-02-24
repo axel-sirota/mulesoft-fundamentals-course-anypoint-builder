@@ -1,0 +1,220 @@
+#%RAML 1.0
+# Solution: Module 3, Lab 1 — Customer System API
+# This is the complete RAML 1.0 specification. Compare with your starter.
+title: Customer System API
+version: v1
+baseUri: http://localhost:8081/api
+mediaType: application/json
+
+types:
+  Customer:
+    properties:
+      id: string
+      firstName: string
+      lastName: string
+      email: string
+      phone?: string
+      company: string
+      industry: string
+      billingStreet?: string
+      billingCity?: string
+      billingState?: string
+      billingPostalCode?: string
+
+  Contact:
+    properties:
+      id: string
+      firstName: string
+      lastName: string
+      email: string
+      phone?: string
+      title?: string
+      accountId: string
+
+  ErrorResponse:
+    properties:
+      message: string
+      code: integer
+
+traits:
+  errorResponses:
+    responses:
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example:
+              message: "Bad request"
+              code: 400
+      404:
+        body:
+          application/json:
+            type: ErrorResponse
+            example:
+              message: "Resource not found"
+              code: 404
+      500:
+        body:
+          application/json:
+            type: ErrorResponse
+            example:
+              message: "Internal server error"
+              code: 500
+
+/customers:
+  get:
+    is: [errorResponses]
+    description: List customers, optionally filtered by industry
+    queryParameters:
+      industry:
+        type: string
+        required: false
+        description: Filter customers by industry
+      limit:
+        type: integer
+        default: 25
+        minimum: 1
+        maximum: 100
+        description: Maximum number of results to return
+      offset:
+        type: integer
+        default: 0
+        description: Number of results to skip for pagination
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer[]
+            example:
+              -
+                id: "ACCT-001"
+                firstName: "Leanne"
+                lastName: "Graham"
+                email: "leanne.graham@romaguera.com"
+                company: "Romaguera-Crona"
+                industry: "Technology"
+              -
+                id: "ACCT-002"
+                firstName: "Ervin"
+                lastName: "Howell"
+                email: "ervin.howell@deckow.com"
+                company: "Deckow-Crist"
+                industry: "Technology"
+              -
+                id: "ACCT-004"
+                firstName: "Patricia"
+                lastName: "Lebsack"
+                email: "patricia.lebsack@robel.com"
+                company: "Robel-Corkery"
+                industry: "Technology"
+
+  post:
+    is: [errorResponses]
+    description: Create a new customer
+    body:
+      application/json:
+        type: Customer
+        example:
+          id: "ACCT-011"
+          firstName: "Jane"
+          lastName: "Doe"
+          email: "jane.doe@newcorp.com"
+          company: "NewCorp Industries"
+          industry: "Technology"
+    responses:
+      201:
+        body:
+          application/json:
+            type: Customer
+            example:
+              id: "ACCT-011"
+              firstName: "Jane"
+              lastName: "Doe"
+              email: "jane.doe@newcorp.com"
+              company: "NewCorp Industries"
+              industry: "Technology"
+
+  /{customerId}:
+    get:
+      is: [errorResponses]
+      description: Get a single customer by ID
+      responses:
+        200:
+          body:
+            application/json:
+              type: Customer
+              example:
+                id: "ACCT-001"
+                firstName: "Leanne"
+                lastName: "Graham"
+                email: "leanne.graham@romaguera.com"
+                phone: "555-0001"
+                company: "Romaguera-Crona"
+                industry: "Technology"
+                billingStreet: "123 Innovation Drive"
+                billingCity: "San Francisco"
+                billingState: "CA"
+                billingPostalCode: "94105"
+
+    put:
+      is: [errorResponses]
+      description: Update an existing customer
+      body:
+        application/json:
+          type: Customer
+          example:
+            id: "ACCT-001"
+            firstName: "Leanne"
+            lastName: "Graham"
+            email: "leanne.graham@romaguera.com"
+            phone: "555-0001"
+            company: "Romaguera-Crona"
+            industry: "Technology"
+            billingStreet: "456 Updated Blvd"
+            billingCity: "San Francisco"
+            billingState: "CA"
+            billingPostalCode: "94105"
+      responses:
+        200:
+          body:
+            application/json:
+              type: Customer
+              example:
+                id: "ACCT-001"
+                firstName: "Leanne"
+                lastName: "Graham"
+                email: "leanne.graham@romaguera.com"
+                phone: "555-0001"
+                company: "Romaguera-Crona"
+                industry: "Technology"
+                billingStreet: "456 Updated Blvd"
+                billingCity: "San Francisco"
+                billingState: "CA"
+                billingPostalCode: "94105"
+
+    /contacts:
+      get:
+        is: [errorResponses]
+        description: Get contacts for a specific customer
+        responses:
+          200:
+            body:
+              application/json:
+                type: Contact[]
+                example:
+                  -
+                    id: "CONT-001"
+                    firstName: "Chelsey"
+                    lastName: "Graham"
+                    email: "chelsey.graham@romaguera.com"
+                    phone: "555-0101"
+                    title: "VP Sales"
+                    accountId: "ACCT-001"
+                  -
+                    id: "CONT-002"
+                    firstName: "Dennis"
+                    lastName: "Graham"
+                    email: "dennis.graham@romaguera.com"
+                    phone: "555-0102"
+                    title: "CTO"
+                    accountId: "ACCT-001"

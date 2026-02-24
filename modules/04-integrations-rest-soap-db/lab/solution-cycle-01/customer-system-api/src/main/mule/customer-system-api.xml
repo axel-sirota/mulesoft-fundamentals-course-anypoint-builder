@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 1 — APIkit Scaffold
+     All flows return stub/mock data from RAML examples. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <!-- Main API flow: HTTP Listener → APIkit Router -->
+    <flow name="customer-system-api-main">
+        <http:listener config-ref="HTTP_Listener_Config" path="/api/*" doc:name="HTTP Listener">
+            <http:response statusCode="#[vars.httpStatus default 200]"/>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-config" doc:name="APIkit Router"/>
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <set-variable variableName="httpStatus" value="400" doc:name="Set 400"/>
+                <set-payload value='#[output application/json --- {message: "Bad request"}]' doc:name="Bad Request"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <set-variable variableName="httpStatus" value="404" doc:name="Set 404"/>
+                <set-payload value='#[output application/json --- {message: "Resource not found"}]' doc:name="Not Found"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <set-variable variableName="httpStatus" value="405" doc:name="Set 405"/>
+                <set-payload value='#[output application/json --- {message: "Method not allowed"}]' doc:name="Method Not Allowed"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <set-variable variableName="httpStatus" value="406" doc:name="Set 406"/>
+                <set-payload value='#[output application/json --- {message: "Not acceptable"}]' doc:name="Not Acceptable"/>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <set-variable variableName="httpStatus" value="415" doc:name="Set 415"/>
+                <set-payload value='#[output application/json --- {message: "Unsupported media type"}]' doc:name="Unsupported Media Type"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <!-- GET /customers — stub returning RAML example data -->
+    <flow name="get:\customers:api-config">
+        <set-payload value='#[output application/json --- [
+  {id: "ACCT-001", firstName: "Leanne", lastName: "Graham", email: "leanne.graham@romaguera.com", company: "Romaguera-Crona", industry: "Technology"},
+  {id: "ACCT-002", firstName: "Ervin", lastName: "Howell", email: "ervin.howell@deckow.com", company: "Deckow-Crist", industry: "Technology"},
+  {id: "ACCT-004", firstName: "Patricia", lastName: "Lebsack", email: "patricia.lebsack@robel.com", company: "Robel-Corkery", industry: "Technology"}
+]]' doc:name="Stub: List Customers"/>
+    </flow>
+
+    <!-- POST /customers — stub returning 201 -->
+    <flow name="post:\customers:api-config">
+        <set-variable variableName="httpStatus" value="201" doc:name="Set 201"/>
+        <set-payload value='#[output application/json --- {id: "ACCT-011", firstName: "Jane", lastName: "Doe", email: "jane.doe@newcorp.com", company: "NewCorp Industries", industry: "Technology"}]' doc:name="Stub: Create Customer"/>
+    </flow>
+
+    <!-- GET /customers/{customerId} — STUB (Cycle 1: returns mock data directly) -->
+    <flow name="get:\customers\(customerId):api-config">
+        <set-payload value='#[output application/json --- {
+  id: attributes.uriParams.customerId,
+  firstName: "Leanne",
+  lastName: "Graham",
+  email: "leanne.graham@romaguera.com",
+  company: "Romaguera-Crona",
+  industry: "Technology"
+}]' doc:name="Stub: Get Customer"/>
+    </flow>
+
+    <!-- PUT /customers/{customerId} — stub -->
+    <flow name="put:\customers\(customerId):api-config">
+        <set-payload value='#[output application/json --- {id: attributes.uriParams.customerId, firstName: "Leanne", lastName: "Graham", email: "leanne.graham@romaguera.com", company: "Romaguera-Crona", industry: "Technology"}]' doc:name="Stub: Update Customer"/>
+    </flow>
+
+    <!-- GET /customers/{customerId}/contacts — stub -->
+    <flow name="get:\customers\(customerId)\contacts:api-config">
+        <set-payload value='#[output application/json --- [
+  {id: "CONT-001", firstName: "Chelsey", lastName: "Graham", email: "chelsey.graham@romaguera.com", phone: "555-0101", title: "VP Sales", accountId: attributes.uriParams.customerId},
+  {id: "CONT-002", firstName: "Dennis", lastName: "Graham", email: "dennis.graham@romaguera.com", phone: "555-0102", title: "CTO", accountId: attributes.uriParams.customerId}
+]]' doc:name="Stub: List Contacts"/>
+    </flow>
+
+</mule>

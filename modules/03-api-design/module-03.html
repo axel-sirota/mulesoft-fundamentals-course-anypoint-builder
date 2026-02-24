@@ -606,7 +606,7 @@ baseUri: http://localhost:8081/api
 
       <div class="diagram-container">
         <pre class="mermaid">
-graph LR
+graph TD
     Client[API Consumer] --> GW[API Gateway]
     subgraph Policies["Applied Policies"]
         RL[Rate Limiting<br/>10 req/min]

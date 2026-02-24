@@ -318,6 +318,8 @@
       <div class="section-group-title">Module 2</div>
       <a href="#architecture" class="active">Platform Architecture</a>
       <a href="#deep-dive">Component Deep Dive</a>
+      <a href="#acb-deep-dive">ACB in VS Code</a>
+      <a href="#platform-mapping">Platform &harr; ACB Map</a>
       <a href="#demo">Demo: Walkthrough</a>
       <a href="#lab">Lab: Scavenger Hunt</a>
     </div>
@@ -375,7 +377,7 @@
 
       <div class="diagram-container">
         <pre class="mermaid">
-graph LR
+graph TD
     subgraph Design &amp; Build
         DC["Design Center<br/>(API Designer)"]
         EX["Exchange<br/>(Asset Catalog)"]
@@ -412,7 +414,54 @@ graph LR
 
       <p>The flow is straightforward: you design an API specification in Design Center, publish it to Exchange (the shared asset catalog), scaffold a project from that spec in Anypoint Code Builder, implement your business logic, deploy to CloudHub via Runtime Manager, and then apply security policies in API Manager. Every tool hands off to the next.</p>
 
-      <h3>Diagram 2: The API Lifecycle</h3>
+      <h3>Diagram 2: What Happens at Runtime</h3>
+
+      <p>The architecture diagram above shows the build-time tools. But what actually happens when a client sends a request to your deployed API? The request passes through several layers — each managed by a different platform component — before reaching your backend systems and returning an enriched response.</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    CLIENT["Client<br/>(curl / browser / app)"] -->|"HTTPS request"| GW["API Gateway<br/>(rate limit, auth)"]
+    GW -->|"validated request"| MULE["Mule Runtime<br/>(CloudHub 2.0)"]
+
+    subgraph Your Flow
+        ROUTER["APIkit Router"] --> DW["DataWeave<br/>Transform"]
+        DW --> CONN["Connectors"]
+    end
+
+    MULE --> ROUTER
+
+    subgraph External Systems
+        REST["REST API"]
+        SOAP["SOAP Service"]
+        DB["Database"]
+        SF["Salesforce"]
+    end
+
+    CONN --> REST
+    CONN --> SOAP
+    CONN --> DB
+    CONN --> SF
+
+    CONN -->|"aggregated data"| DW2["DataWeave<br/>Response Transform"]
+    DW2 -->|"JSON response"| CLIENT
+
+    classDef platform fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef developer fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef external fill:#2D333B,stroke:#8B949E,color:#fff
+    classDef client fill:#7B1FA2,stroke:#4A148C,color:#fff
+
+    class CLIENT client
+    class GW,MULE platform
+    class ROUTER,DW,CONN,DW2 developer
+    class REST,SOAP,DB,SF external
+        </pre>
+        <p class="diagram-caption">Figure 2: Runtime Request Flow — blue = platform-managed, orange = developer-built, gray = external systems, purple = client</p>
+      </div>
+
+      <p>Blue nodes are managed by the platform (API Gateway applies your policies, CloudHub runs your app). Orange nodes are what you build (your flow logic, DataWeave transforms, connector calls). Gray nodes are the external systems you integrate with. By Module 7, your Customer 360 API will follow exactly this path — a single request fans out to four backends and returns one enriched response.</p>
+
+      <h3>Diagram 3: The API Development Lifecycle</h3>
 
       <p>Each step in the lifecycle maps to a specific module in this course. Here's the full development workflow you'll follow over the next three days:</p>
 
@@ -423,12 +472,15 @@ graph LR
     S2["2. Publish to Exchange<br/><em>Module 3</em>"]
     S3["3. Scaffold in ACB<br/><em>Module 4</em>"]
     S4["4. Implement Flows<br/><em>Module 4</em>"]
+
+    S1 --> S2 --> S3 --> S4
+
     S5["5. Write MUnit Tests<br/><em>Module 4</em>"]
     S6["6. Test Locally<br/><em>Module 4</em>"]
     S7["7. Deploy to CloudHub<br/><em>Module 7</em>"]
     S8["8. Apply Policies<br/><em>Module 7</em>"]
 
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8
+    S4 --> S5 --> S6 --> S7 --> S8
 
     classDef day1 fill:#00A1E0,stroke:#0078D4,color:#fff
     classDef day2 fill:#FF6D00,stroke:#E65100,color:#fff
@@ -438,7 +490,7 @@ graph LR
     class S3,S4,S5,S6 day2
     class S7,S8 day3
         </pre>
-        <p class="diagram-caption">Figure 2: The API Lifecycle &mdash; color-coded by course day (blue = Day 1, orange = Day 2, purple = Day 3)</p>
+        <p class="diagram-caption">Figure 3: The API Lifecycle &mdash; color-coded by course day (blue = Day 1, orange = Day 2, purple = Day 3)</p>
       </div>
 
       <div class="callout callout-info">
@@ -446,16 +498,16 @@ graph LR
         <p>Notice how Day 2 (Modules 4-5) covers steps 3-6 &mdash; that's the bulk of the build work. Day 1 is about design, Day 3 is about deployment and governance. This mirrors real-world project timelines: design first, build most, deploy last.</p>
       </div>
 
-      <h3>Diagram 3: MuleSoft MCP Server &mdash; AI-Assisted Development</h3>
+      <h3>Diagram 4: MuleSoft MCP Server &mdash; AI-Assisted Development</h3>
 
       <p>MuleSoft provides an MCP (Model Context Protocol) server that connects your AI-powered IDE &mdash; Cursor, VS Code with Claude Code, or similar &mdash; directly to the Anypoint Platform. Instead of clicking through the web interface, you can generate flows, specs, tests, and even deploy from natural language prompts in your editor.</p>
 
       <div class="diagram-container">
         <pre class="mermaid">
-graph LR
-    DEV["Developer IDE<br/>(Cursor / VS Code /<br/>Claude Code)"]
+graph TD
+    DEV["Developer IDE<br/>(Cursor / VS Code / Claude Code)"]
     MCP["MuleSoft MCP Server<br/>(@mulesoft/mcp-server)"]
-    AP["Anypoint Platform<br/>APIs"]
+    AP["Anypoint Platform APIs"]
 
     DEV <-->|"MCP Protocol"| MCP
     MCP <-->|"REST APIs"| AP
@@ -482,7 +534,7 @@ graph LR
     class AP apStyle
     class T1,T2,T3,T4 toolStyle
         </pre>
-        <p class="diagram-caption">Figure 3: MuleSoft MCP Server &mdash; AI-assisted development from your IDE to Anypoint Platform</p>
+        <p class="diagram-caption">Figure 4: MuleSoft MCP Server &mdash; AI-assisted development from your IDE to Anypoint Platform</p>
       </div>
 
       <p>The MCP server exposes 40+ tools across categories like project creation, flow generation, API spec design, testing, and deployment. You don't need to use it for this course, but it's how modern MuleSoft development is heading &mdash; especially for teams already using AI-powered editors.</p>
@@ -552,7 +604,58 @@ baseUri: http://localhost:8081/api
     <section id="deep-dive">
       <h2>Section 2: Component Deep Dive (10 min)</h2>
 
-      <p>Now let's look at each component in more detail. For each one, you'll learn what it does, how it fits into the Customer 360 project, and which module you'll use it in.</p>
+      <p>Now let's look at each component in more detail. First, here's a map of what you'll see when you log into the Anypoint Platform web interface. The hamburger menu in the top-left corner is your main navigation — everything branches from there.</p>
+
+      <h3>Diagram 5: Anypoint Platform Web UI Navigation</h3>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    HOME["Anypoint Platform Home<br/>(anypoint.mulesoft.com)"]
+
+    HOME --> DC["Design Center"]
+    HOME --> EX["Exchange"]
+    HOME --> RM["Runtime Manager"]
+    HOME --> AM["API Manager"]
+    HOME --> ACC["Access Management"]
+    HOME --> MON["Monitoring"]
+    HOME --> VIS["Visualizer"]
+
+    DC --> DC1["API Designer<br/><em>Write RAML/OAS specs</em>"]
+    DC --> DC2["Flow Designer<br/><em>Visual flow builder (cloud)</em>"]
+
+    EX --> EX1["Connectors<br/><em>SF, HTTP, DB, SOAP</em>"]
+    EX --> EX2["Templates<br/><em>Pre-built integrations</em>"]
+    EX --> EX3["Your APIs<br/><em>Published specs</em>"]
+
+    RM --> RM1["Applications<br/><em>Deploy, start, stop</em>"]
+    RM --> RM2["Settings<br/><em>Environments, alerts</em>"]
+
+    AM --> AM1["API Instances<br/><em>Register from Exchange</em>"]
+    AM --> AM2["Policies<br/><em>Rate limit, auth, SLA</em>"]
+    AM --> AM3["Clients<br/><em>App registrations</em>"]
+
+    ACC --> ACC1["Connected Apps<br/><em>OAuth credentials</em>"]
+    ACC --> ACC2["Environments<br/><em>Sandbox, Production</em>"]
+    ACC --> ACC3["Roles &amp; Permissions"]
+
+    classDef home fill:#1A1F36,stroke:#0078D4,color:#fff
+    classDef section fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef subsection fill:#2D333B,stroke:#8B949E,color:#fff
+
+    class HOME home
+    class DC,EX,RM,AM,ACC,MON,VIS section
+    class DC1,DC2,EX1,EX2,EX3,RM1,RM2,AM1,AM2,AM3,ACC1,ACC2,ACC3 subsection
+        </pre>
+        <p class="diagram-caption">Figure 5: Anypoint Platform Web UI Navigation — the hamburger menu is your entry point to every platform section</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Where to Find Things</div>
+        <p>When you log in, look for the hamburger menu (three horizontal lines) in the top-left corner. That's how you navigate between Design Center, Exchange, Runtime Manager, and the other sections. In the scavenger hunt lab, you'll visit each of these.</p>
+      </div>
+
+      <p>For each component below, you'll learn what it does, how it fits into the Customer 360 project, and which module you'll use it in.</p>
 
       <div class="component-cards">
 
@@ -581,6 +684,7 @@ baseUri: http://localhost:8081/api
           <p>Where you'll build all your Mule flows from Module 4 onward. ACB is a VS Code extension &mdash; it works in VS Code, Cursor, or as a cloud IDE in the browser. It has a visual canvas for drag-and-drop flow building and an XML editor. Both views stay in sync: edit in one, see the change in the other.</p>
           <p>ACB is MuleSoft's strategic IDE direction. All new AI-assisted features (flow generation, spec scaffolding) are ACB-exclusive. Anypoint Studio still works but ACB is where the innovation is happening.</p>
           <p class="module-ref">Used in: Modules 4, 5, 6, 7</p>
+          <p><strong>See the detailed ACB deep dive below</strong> &mdash; Diagrams 6, 7, and 8 walk through the IDE layout, canvas workflow, and command palette.</p>
         </div>
 
         <!-- Card d: Runtime Manager -->
@@ -602,6 +706,198 @@ baseUri: http://localhost:8081/api
         </div>
 
       </div><!-- end component-cards -->
+
+      <!-- ACB Deep Dive Subsection -->
+      <h3 id="acb-deep-dive">Anypoint Code Builder &mdash; A Closer Look</h3>
+
+      <p>Since ACB is where you'll spend most of your build time (Modules 4-7), let's look at its layout, workflow, and key commands in detail. When you open ACB in VS Code, here's what you'll see:</p>
+
+      <h4>Diagram 6: ACB VS Code Layout</h4>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Activity Bar
+        AB1["Explorer<br/>(files &amp; folders)"]
+        AB2["MuleSoft Icon<br/>(ACB features)"]
+        AB3["Source Control<br/>(Git)"]
+        AB4["Run &amp; Debug<br/>(test locally)"]
+        AB5["Extensions"]
+    end
+
+    subgraph MuleSoft Panel
+        QA["Quick Actions"]
+        QA1["Design an API"]
+        QA2["Develop an Integration"]
+        QA3["Implement an API Spec"]
+        DOC["Documentation Links"]
+        SET["Settings (gear icon)"]
+        QA --> QA1
+        QA --> QA2
+        QA --> QA3
+    end
+
+    AB2 --> QA
+
+    subgraph Main Editor Area
+        CANVAS["Canvas View<br/>(visual flow builder)"]
+        XML["XML Editor<br/>(configuration XML)"]
+        TOGGLE["Toggle: &lt;/&gt; icon<br/>or side-by-side"]
+        CANVAS <--> TOGGLE
+        TOGGLE <--> XML
+    end
+
+    QA3 -->|"scaffolds"| CANVAS
+    CANVAS -->|"auto-updates"| XML
+
+    subgraph Bottom Panels
+        OUTPUT["Output<br/>(Mule DX Server logs)"]
+        PROBLEMS["Problems<br/>(errors &amp; warnings)"]
+        TERMINAL["Terminal<br/>(mvn, curl, etc.)"]
+    end
+
+    classDef actBar fill:#1A1F36,stroke:#8B949E,color:#fff
+    classDef panel fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef editor fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef bottom fill:#2D333B,stroke:#8B949E,color:#fff
+
+    class AB1,AB2,AB3,AB4,AB5 actBar
+    class QA,QA1,QA2,QA3,DOC,SET panel
+    class CANVAS,XML,TOGGLE editor
+    class OUTPUT,PROBLEMS,TERMINAL bottom
+        </pre>
+        <p class="diagram-caption">Figure 6: ACB VS Code Layout &mdash; dark blue = Activity Bar, blue = MuleSoft Panel, orange = Editor views, gray = Bottom panels</p>
+      </div>
+
+      <p>The key entry point is the <strong>MuleSoft icon</strong> in the Activity Bar (left edge). Clicking it opens the MuleSoft Panel with Quick Actions — that's where you start every project. The Main Editor area switches between the Canvas (visual, drag-and-drop) and the XML Editor (code). Click the <code>&lt;/&gt;</code> icon in the toolbar to toggle, or right-click a tab to open both side-by-side.</p>
+
+      <h4>Diagram 7: ACB Canvas Workflow &mdash; Adding &amp; Configuring Components</h4>
+
+      <p>When you build a flow in Module 4, you'll repeat this loop dozens of times: add a component, configure it, see the XML update. Here's the workflow:</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    START["Open Canvas View"] --> ADD["Click (+) Add Component"]
+    ADD --> SEARCH["Search or Browse<br/>(Connectors, Modules, Core)"]
+    SEARCH --> SELECT["Select Component<br/>(e.g., HTTP Listener)"]
+    SELECT --> APPEARS["Component Appears<br/>in Flow on Canvas"]
+    APPEARS --> CLICK["Click Component<br/>to Configure"]
+    CLICK --> CONFIG["Configuration Panel Opens"]
+
+    CONFIG --> PROPS["Set Properties<br/>(paths, URLs, expressions)"]
+    CONFIG --> FX["Click fx for<br/>DataWeave Expressions"]
+    CONFIG --> CONN["Select or Create<br/>Connection Config"]
+    CONFIG --> TEST["Test Connection<br/>(verify it works)"]
+
+    PROPS --> XML_UPDATE["XML Auto-Updates<br/>in Background"]
+    FX --> XML_UPDATE
+    CONN --> XML_UPDATE
+    TEST --> XML_UPDATE
+
+    XML_UPDATE --> ADD
+
+    classDef start fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef action fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef config fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef sync fill:#059669,stroke:#047857,color:#fff
+
+    class START start
+    class ADD,SEARCH,SELECT,APPEARS,CLICK action
+    class CONFIG,PROPS,FX,CONN,TEST config
+    class XML_UPDATE sync
+        </pre>
+        <p class="diagram-caption">Figure 7: ACB Canvas Workflow &mdash; the build loop you'll repeat for every component in your flow</p>
+      </div>
+
+      <p>The key insight is the bidirectional sync between canvas and XML. When you configure a component in the visual panel, the XML updates automatically. When you edit the XML directly, the canvas reflects the change. You can work in whichever mode feels natural — most developers start on the canvas and switch to XML for fine-tuning.</p>
+
+      <h4>Diagram 8: ACB Command Palette &mdash; Key Commands</h4>
+
+      <p>The Command Palette (<code>Cmd+Shift+P</code> on Mac, <code>Ctrl+Shift+P</code> on Windows) is your control center. All MuleSoft commands are prefixed with <code>MuleSoft:</code> and organized into categories. Here are the commands you'll use most:</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    CMD["Command Palette<br/>(Cmd/Ctrl + Shift + P)"]
+
+    CMD --> API["API Design"]
+    CMD --> INT["Integration &amp; Deployment"]
+    CMD --> GEN["General"]
+
+    API --> A1["MuleSoft: Design an API<br/><em>Module 3</em>"]
+    API --> A2["MuleSoft: Publish API<br/>Project to Exchange<br/><em>Module 3</em>"]
+    API --> A3["MuleSoft: Implement<br/>an API Specification<br/><em>Module 4</em>"]
+    API --> A4["MuleSoft: Re-scaffold<br/>this local API"]
+
+    INT --> I1["MuleSoft: Develop<br/>an Integration"]
+    INT --> I2["MuleSoft: Import Asset<br/>from Exchange<br/><em>Module 4</em>"]
+    INT --> I3["MuleSoft: Deploy<br/>to CloudHub<br/><em>Module 7</em>"]
+    INT --> I4["MuleSoft: Export Project<br/>to Deployable Jar"]
+
+    GEN --> G1["MuleSoft: Login to<br/>Anypoint Platform"]
+    GEN --> G2["MuleSoft: Open<br/>ACB Settings"]
+    GEN --> G3["MuleSoft: Search<br/>in Exchange"]
+
+    classDef cmd fill:#1A1F36,stroke:#0078D4,color:#fff
+    classDef cat fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef apiCmd fill:#059669,stroke:#047857,color:#fff
+    classDef intCmd fill:#FF6D00,stroke:#E65100,color:#fff
+    classDef genCmd fill:#7B1FA2,stroke:#4A148C,color:#fff
+
+    class CMD cmd
+    class API,INT,GEN cat
+    class A1,A2,A3,A4 apiCmd
+    class I1,I2,I3,I4 intCmd
+    class G1,G2,G3 genCmd
+        </pre>
+        <p class="diagram-caption">Figure 8: ACB Command Palette — key MuleSoft commands organized by category, with module references</p>
+      </div>
+
+      <p>You don't need to memorize these — just remember <code>Cmd+Shift+P</code> and type "MuleSoft" to see everything available. The commands are context-aware: project-specific actions (like Deploy to CloudHub) only appear when you have a Mule project open. The module labels show when you'll first use each command.</p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Pro Tip</div>
+        <p>The most important command to remember is <code>MuleSoft: Implement an API Specification</code>. In Module 4, you'll use it to scaffold your entire Mule project from the RAML spec you designed in Module 3. It pulls your spec from Exchange, generates all the flow stubs, and creates the project structure — saving you hours of manual setup.</p>
+      </div>
+
+      <!-- Platform ↔ ACB Mapping Diagram -->
+      <h3 id="platform-mapping">Diagram 9: Platform Web UI &harr; ACB &mdash; Where Things Live</h3>
+
+      <p>Here's the key insight: almost everything you do in the Anypoint Platform web UI has an equivalent action in ACB. You don't need to constantly switch between your browser and your IDE. This diagram maps each platform component to its ACB counterpart:</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph Anypoint Web UI
+        W_DC["Design Center<br/>(browser)"]
+        W_EX["Exchange<br/>(browser)"]
+        W_RM["Runtime Manager<br/>(browser)"]
+        W_AM["API Manager<br/>(browser)"]
+    end
+
+    subgraph ACB in VS Code
+        A_DC["MuleSoft: Design an API<br/>(creates spec project)"]
+        A_EX["MuleSoft: Search in Exchange<br/>+ Import Asset from Exchange<br/>+ Connector Palette"]
+        A_RM["MuleSoft: Deploy to CloudHub<br/>(one-click deploy)"]
+        A_AM["API Autodiscovery Config<br/>(in application.properties)"]
+    end
+
+    W_DC <-->|"same result"| A_DC
+    W_EX <-->|"same catalog"| A_EX
+    W_RM <-->|"same target"| A_RM
+    W_AM <-->|"configured in"| A_AM
+
+    classDef web fill:#00A1E0,stroke:#0078D4,color:#fff
+    classDef acb fill:#FF6D00,stroke:#E65100,color:#fff
+
+    class W_DC,W_EX,W_RM,W_AM web
+    class A_DC,A_EX,A_RM,A_AM acb
+        </pre>
+        <p class="diagram-caption">Figure 9: Platform Web UI &harr; ACB Mapping — blue = web interface, orange = ACB equivalent. Most workflows can stay entirely in your IDE.</p>
+      </div>
+
+      <p>For this course, you'll use the web UI for initial exploration (Module 2 scavenger hunt) and for tasks that are browser-only (like viewing API Manager analytics). For everything else — designing specs, building flows, testing, deploying — you can work entirely in ACB without leaving VS Code.</p>
 
     </section>
 

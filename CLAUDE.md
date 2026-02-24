@@ -20,7 +20,7 @@ Always use slash commands to orchestrate work:
 | `/research X` | Deep research with 3 cycles of hypothesis → evidence → refutation |
 | `/code-review` | Systematic review of materials for quality, consistency, security |
 
-**Build loop per module:** Solution FIRST → validate it works → strip to create starter with TODOs → generate lab instructions → generate MUnit tests → verify tests pass → commit.
+**Build loop per module:** Solution FIRST → validate it works → strip to create starter with TODOs → generate lab instructions → **create demo artifacts** → generate MUnit tests → verify tests pass → verify demos run → commit.
 
 ## Key Source Documents
 
@@ -43,11 +43,12 @@ Can be parallelized: shared/mock-api + infrastructure, Modules 1+2, Module 5 fix
 ## Repository Structure
 
 ```
-modules/{01-07}-*/           # Each module: HTML notebook + lab/starter + lab/solution
+modules/{01-07}-*/           # Each module: HTML notebook + demos + lab/starter + lab/solution
   module-{NN}.html           # Instructor version (source of truth, has instructor notes)
   module-{NN}-student.html   # Student version (auto-generated, no instructor notes)
+  demo-*.{py,raml,...}       # Demo artifacts (instructor safety net + student take-home)
   lab/starter/               # Student starting point with numbered TODOs
-  lab/solution/              # Complete working implementation
+  lab/solution/              # Complete working implementation (also serves as demo when demo=lab)
 
 infrastructure/              # Docker services for Module 4 labs
   docker-compose.yml         # REST API (8090) + SOAP (8091) + PostgreSQL (5432)

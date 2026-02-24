@@ -1,0 +1,14 @@
+{
+  "validationResult": {
+    "status": "VALID",
+    "standardizedAddress": {
+      "street": "742 Evergreen Terrace",
+      "city": "Austin",
+      "state": "TX",
+      "postalCode": "78701",
+      "country": "US"
+    },
+    "deliverability": "DELIVERABLE",
+    "validatedAt": "2026-02-23T10:30:00Z"
+  }
+}

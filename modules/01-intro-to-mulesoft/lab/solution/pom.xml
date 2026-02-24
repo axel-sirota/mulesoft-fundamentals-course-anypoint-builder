@@ -16,6 +16,8 @@
         <app.runtime>4.9.0</app.runtime>
         <http.connector.version>1.9.3</http.connector.version>
         <mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     
     <build>

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ACCT-001",
+    "firstName": "Leanne",
+    "lastName": "Graham",
+    "email": "leanne.graham@romaguera.com",
+    "phone": "(512) 555-0101",
+    "company": "Romaguera-Crona"
+  },
+  {
+    "id": "ACCT-002",
+    "firstName": "Ervin",
+    "lastName": "Howell",
+    "email": null,
+    "phone": "(415) 555-0102",
+    "company": "Deckow-Crist"
+  },
+  {
+    "id": "ACCT-003",
+    "firstName": "Clementine",
+    "lastName": "Bauch",
+    "email": "clementine.bauch@keebler.com",
+    "phone": null,
+    "company": null
+  },
+  {
+    "id": "ACCT-004",
+    "firstName": "Patricia",
+    "lastName": "Lebsack",
+    "company": "Robel-Corkery"
+  },
+  {
+    "id": "ACCT-005",
+    "firstName": "Chelsey",
+    "lastName": "Dietrich",
+    "email": null,
+    "phone": null,
+    "company": null
+  },
+  {
+    "id": "ACCT-006",
+    "firstName": "Dennis",
+    "lastName": "Schulist",
+    "email": "dennis.schulist@kulas.com",
+    "company": "Kulas Light Inc"
+  },
+  {
+    "id": "ACCT-007",
+    "firstName": "Kurtis",
+    "lastName": "Weissnat",
+    "email": "kurtis.weissnat@hoeger.com",
+    "phone": "(303) 555-0107"
+  },
+  {
+    "id": "ACCT-008",
+    "firstName": "Nicholas",
+    "lastName": "Runolfsdottir",
+    "email": null,
+    "phone": "(615) 555-0108",
+    "company": "Stanton Group"
+  }
+]

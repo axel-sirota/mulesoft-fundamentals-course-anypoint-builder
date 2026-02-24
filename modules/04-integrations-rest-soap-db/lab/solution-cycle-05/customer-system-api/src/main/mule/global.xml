@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solution: Module 4, Cycle 5 — Global Config + REST + Database + SOAP
+     All connectors present but still hardcoded. Refactoring in Cycle 6. -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+    <http:listener-config name="HTTP_Listener_Config" doc:name="HTTP Listener Config">
+        <http:listener-connection host="0.0.0.0" port="8081"/>
+    </http:listener-config>
+
+    <apikit:config name="api-config" api="api/customer-system-api.raml"
+                   outboundHeadersMapName="outboundHeaders"
+                   httpStatusVarName="httpStatus" doc:name="APIkit Config"/>
+
+    <!-- Cycle 3: REST Enrichment API (hardcoded host/port) -->
+    <http:request-config name="Enrichment_API" basePath="/api" doc:name="Enrichment API">
+        <http:request-connection host="localhost" port="8090"/>
+    </http:request-config>
+
+    <!-- Cycle 4: PostgreSQL Database (hardcoded connection) -->
+    <db:config name="PostgreSQL_Config" doc:name="PostgreSQL Config">
+        <db:generic-connection
+            url="jdbc:postgresql://localhost:5432/customer360"
+            user="mulesoft"
+            password="mulesoft"
+            driverClassName="org.postgresql.Driver"/>
+    </db:config>
+
+    <!-- Cycle 5: SOAP Address Validation (hardcoded WSDL URL) -->
+    <wsc:config name="Address_Validation" doc:name="Address Validation WSC">
+        <wsc:connection wsdlLocation="http://localhost:8091/?wsdl"
+                        service="AddressService"
+                        port="AddressPort"/>
+    </wsc:config>
+</mule>

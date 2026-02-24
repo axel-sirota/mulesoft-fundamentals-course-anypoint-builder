@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ACCT-001",
+    "fullName": "Leanne Graham",
+    "email": "leanne.graham@romaguera.com",
+    "phone": "(512) 555-0101",
+    "company": "Romaguera-Crona"
+  },
+  {
+    "id": "ACCT-002",
+    "fullName": "Ervin Howell",
+    "email": "unknown@example.com",
+    "phone": "(415) 555-0102",
+    "company": "Deckow-Crist"
+  },
+  {
+    "id": "ACCT-003",
+    "fullName": "Clementine Bauch",
+    "email": "clementine.bauch@keebler.com",
+    "phone": "N/A",
+    "company": "Unaffiliated"
+  },
+  {
+    "id": "ACCT-004",
+    "fullName": "Patricia Lebsack",
+    "email": "unknown@example.com",
+    "phone": "N/A",
+    "company": "Robel-Corkery"
+  },
+  {
+    "id": "ACCT-005",
+    "fullName": "Chelsey Dietrich",
+    "email": "unknown@example.com",
+    "phone": "N/A",
+    "company": "Unaffiliated"
+  },
+  {
+    "id": "ACCT-006",
+    "fullName": "Dennis Schulist",
+    "email": "dennis.schulist@kulas.com",
+    "phone": "N/A",
+    "company": "Kulas Light Inc"
+  },
+  {
+    "id": "ACCT-007",
+    "fullName": "Kurtis Weissnat",
+    "email": "kurtis.weissnat@hoeger.com",
+    "phone": "(303) 555-0107",
+    "company": "Unaffiliated"
+  },
+  {
+    "id": "ACCT-008",
+    "fullName": "Nicholas Runolfsdottir",
+    "email": "unknown@example.com",
+    "phone": "(615) 555-0108",
+    "company": "Stanton Group"
+  }
+]

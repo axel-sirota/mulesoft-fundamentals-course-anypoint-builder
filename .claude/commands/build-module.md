@@ -32,6 +32,15 @@ Builds a complete module following the course blueprint and prompt specification
 - Lab solutions: complete working implementations.
 - Fixtures: realistic, consistent data using Customer 360 domain.
 
+**4.5. Create Demo Artifacts**
+- For each instructor demo section in the HTML (`<details class="instructor-note">` with "Demo" in summary), ensure a corresponding artifact exists.
+- If the demo builds the same thing as the lab → verify `lab/solution/` is complete (it IS the demo artifact).
+- If the demo builds something different → create a `demo-{name}.{ext}` file at the module root.
+- Demo artifacts are the instructor's safety net, time fallback, and student take-home. They are NON-NEGOTIABLE.
+- Verify each demo artifact runs/compiles/parses without errors.
+- Add header comments linking each artifact to its demo section.
+- See `.claude/rules/lab-generation.md` "Demo Artifacts" section for the full spec.
+
 **5. Generate Student Version**
 - Run `shared/scripts/generate-student-html.py` on the instructor HTML to produce `module-{NN}-student.html`.
 - Verify the student version has **zero** `instructor-note` occurrences.

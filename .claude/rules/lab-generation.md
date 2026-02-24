@@ -14,12 +14,14 @@ Follow this sequence every time. Do not skip steps.
 3. Strip solution → create starter (replace implementations with TODOs)
 4. Walk through starter as if you're a student → find gaps?
 5. Generate lab instructions for the HTML notebook
-6. Generate MUnit tests for the solution
-7. Verify tests pass against solution
-8. Commit solution + starter + tests + instructions
+6. Create demo artifacts (completed versions of every instructor demo in the module)
+7. Generate MUnit tests for the solution
+8. Verify tests pass against solution
+9. Verify demo artifacts run/render correctly
+10. Commit solution + starter + tests + demos + instructions
 ```
 
-**Critical**: Solution is ALWAYS built first. Starter is derived from solution by removing implementation and adding TODOs. Never build starter first.
+**Critical**: Solution is ALWAYS built first. Starter is derived from solution by removing implementation and adding TODOs. Never build starter first. Demo artifacts are NON-NEGOTIABLE — they are the instructor's safety net, the time-pressure fallback, and the student's take-home reference.
 
 ---
 
@@ -80,6 +82,56 @@ Follow this sequence every time. Do not skip steps.
 // Solution: Exercise 1 — Filter & Map
 // Validated in DW Playground — verify before production use
 ```
+
+---
+
+## Demo Artifacts
+
+Demos are the instructor's **safety net**, **time-pressure fallback**, and **student take-home**. Every instructor demo section in the HTML notebook must have a corresponding artifact that can be shown directly if the live demo fails or time runs short.
+
+### Two Types of Demo Artifacts
+
+**Standalone demos** — The demo builds something DIFFERENT from the lab:
+- Create a separate `demo-{descriptive-name}.{ext}` file at the **module root level**
+- Examples: `demo-coupled.py` (Module 1), `demo-customer-api.raml` (Module 3)
+- The packaging script automatically collects these into a `demos/` folder in the zip
+
+**Lab-as-demo** — The demo builds the SAME thing as the lab:
+- `lab/solution/` serves double duty as the demo artifact — no separate file needed
+- Examples: Module 4 (cycles build the same project), Module 6 (batch ETL)
+- Document this in the HTML with a comment: `<!-- Demo artifact: lab/solution/ -->`
+
+### Naming Convention
+- Files: `demo-{descriptive-name}.{ext}` (e.g., `demo-coupled.py`, `demo-customer-api.raml`)
+- Placed at module root: `modules/{NN}-{name}/demo-{name}.{ext}`
+- The `collect_demo_files()` function in `package-student-materials.py` picks up all non-HTML files at module root
+
+### Rules
+- Every `<details class="instructor-note">` demo section MUST have an artifact (standalone or lab/solution)
+- Demo artifacts must be runnable/valid: Python compiles, RAML/YAML parses, Mule XML is well-formed
+- Header comment linking to the demo section:
+  ```python
+  # Demo: Module 1, Section 2 — The Coupled Way
+  # Run: python3 demo-coupled.py (with mock API running on port 5173)
+  ```
+  ```yaml
+  # Demo: Module 3, Section 3 — Designing in ACB
+  # This is the completed spec the instructor creates during the live demo.
+  ```
+- Platform UI walkthroughs (Module 2) are the ONE exception — no artifact needed for clicking through a browser
+
+### Module Demo Artifact Map
+
+| Module | Demo | Artifact Type | File |
+|--------|------|--------------|------|
+| 1 | Coupled Python | Standalone | `demo-coupled.py` |
+| 1 | MuleSoft Way | Lab-as-demo | `lab/starter/` (pre-built project) |
+| 2 | Platform Tour | Exception | None (UI walkthrough) |
+| 3 | Design in ACB | Standalone | `demo-customer-api.raml` |
+| 4 | Cycles 1-9 | Lab-as-demo | `lab/solution/` (cycle-9 state) |
+| 5 | DW Playground | Lab-as-demo | Fixture files + exercise solutions |
+| 6 | SF Batch ETL | Lab-as-demo | `lab/solution/` |
+| 7 | Deploy + MAC | Lab-as-demo | `lab/solution/` |
 
 ---
 
@@ -174,3 +226,6 @@ For every lab:
 - [ ] Fixture data is consistent with Customer 360 domain
 - [ ] No hardcoded secrets or real credentials
 - [ ] Property templates use `REPLACE_WITH_*` or `${PLACEHOLDER}` format
+- [ ] Demo artifacts exist for every instructor demo section (standalone or lab/solution)
+- [ ] Demo artifacts run/compile/parse without errors
+- [ ] Demo artifacts match the expected output described in instructor notes

@@ -1,0 +1,68 @@
+# Demo: Module 3, Section 3 — Designing in Anypoint Code Builder
+# This is the completed RAML spec the instructor creates during the live demo.
+# Use as a safety net if the live demo fails, a fallback if time runs short,
+# or a student take-home reference.
+#
+# The demo is intentionally simpler than the full lab solution — it shows just
+# enough to demonstrate the Design Center / ACB workflow:
+#   1. Create a RAML spec with one resource + one data type
+#   2. Add an example response
+#   3. Test with the mocking service (API Console → Try It → Send)
+#   4. Publish to Exchange
+
+#%RAML 1.0
+title: Customer System API Demo
+version: v1
+baseUri: http://localhost:8081/api
+
+types:
+  Customer:
+    properties:
+      id: string
+      firstName: string
+      lastName: string
+      email: string
+      phone?: string
+      company: string
+      industry: string
+
+/customers:
+  get:
+    description: List all customers
+    queryParameters:
+      industry:
+        type: string
+        required: false
+        description: Filter by industry
+    responses:
+      200:
+        body:
+          application/json:
+            type: Customer[]
+            example: |
+              [
+                {
+                  "id": "ACCT-001",
+                  "firstName": "Leanne",
+                  "lastName": "Graham",
+                  "email": "leanne.graham@romaguera.com",
+                  "company": "Romaguera-Crona",
+                  "industry": "Technology"
+                },
+                {
+                  "id": "ACCT-002",
+                  "firstName": "Ervin",
+                  "lastName": "Howell",
+                  "email": "ervin.howell@deckow-crist.com",
+                  "company": "Deckow-Crist",
+                  "industry": "Technology"
+                },
+                {
+                  "id": "ACCT-004",
+                  "firstName": "Patricia",
+                  "lastName": "Lebsack",
+                  "email": "patricia.lebsack@robel-corkery.com",
+                  "company": "Robel-Corkery",
+                  "industry": "Technology"
+                }
+              ]
